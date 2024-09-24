@@ -1,6 +1,5 @@
 package com.shreyas.CloudDemo.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthContributor;
@@ -21,7 +20,7 @@ public class HealthCheckServiceImpl implements HealthCheckService {
 
     public boolean isDataConnectionAvailable() throws Exception {
         try {
-            if(healthContributor instanceof HealthIndicator){
+            if (healthContributor instanceof HealthIndicator) {
                 Health health = ((HealthIndicator) healthContributor).health();
                 return health.getStatus().equals(Status.UP);
             }
