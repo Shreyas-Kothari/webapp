@@ -29,9 +29,7 @@ public class SecurityConfig {
                         })
                         .contentTypeOptions(contentTypeOptions -> {
                         })
-                        .addHeaderWriter((request, response) -> {
-                            response.setHeader(HttpHeaders.DATE, Date.from(Instant.now()).toString());
-                        })
+                        .addHeaderWriter((request, response) -> response.setHeader(HttpHeaders.DATE, Date.from(Instant.now()).toString()))
                 );
 
         return http.build();
