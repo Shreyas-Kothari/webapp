@@ -14,23 +14,21 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/healthz", consumes = "*/*")
-public class HealthCheckController extends BaseController{
+public class HealthCheckController extends BaseController {
 
     @Autowired
     private final HealthCheckService healthCheckService;
 
     @GetMapping
-    public ResponseEntity<Void> checkHealth(){
-        try{
-            if(healthCheckService.isDataConnectionAvailable())
+    public ResponseEntity<Void> checkHealth() {
+        try {
+            if (healthCheckService.isDataConnectionAvailable())
                 return SuccessResponse();
             else
                 return ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE);
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             return ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return ExceptionResponse(e);
         }
 
