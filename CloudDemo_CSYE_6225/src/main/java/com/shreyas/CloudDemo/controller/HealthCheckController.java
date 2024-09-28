@@ -1,6 +1,6 @@
 package com.shreyas.CloudDemo.controller;
 
-import com.shreyas.CloudDemo.service.HealthCheckService;
+import com.shreyas.CloudDemo.service.interfaces.HealthCheckService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
