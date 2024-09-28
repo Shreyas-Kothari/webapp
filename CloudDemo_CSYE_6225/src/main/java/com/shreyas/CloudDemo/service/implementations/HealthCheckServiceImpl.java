@@ -1,5 +1,6 @@
-package com.shreyas.CloudDemo.service;
+package com.shreyas.CloudDemo.service.implementations;
 
+import com.shreyas.CloudDemo.service.interfaces.HealthCheckService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthContributor;

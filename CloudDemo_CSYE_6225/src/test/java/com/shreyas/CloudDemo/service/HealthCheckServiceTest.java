@@ -1,5 +1,6 @@
 package com.shreyas.CloudDemo.service;
 
+import com.shreyas.CloudDemo.service.interfaces.HealthCheckService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
