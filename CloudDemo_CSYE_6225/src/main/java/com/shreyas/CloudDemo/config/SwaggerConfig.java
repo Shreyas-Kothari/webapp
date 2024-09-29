@@ -2,6 +2,10 @@ package com.shreyas.CloudDemo.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -27,5 +31,16 @@ public class SwaggerConfig {
                 .packagesToScan("com.shreyas.CloudDemo.controller") // Specify your controllers' package
                 .addOperationCustomizer(controllerNameCustomizer)
                 .build();
+    }
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("basicScheme",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("basic")))
+                .addSecurityItem(new SecurityRequirement().addList("basicScheme"));
     }
 }

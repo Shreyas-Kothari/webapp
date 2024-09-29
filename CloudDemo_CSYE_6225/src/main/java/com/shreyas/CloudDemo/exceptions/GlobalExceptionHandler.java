@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -30,10 +31,16 @@ public class GlobalExceptionHandler extends BaseController {
         return ErrorResponse(HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Void> handleBadCredentialException(AuthenticationException ex) {
+        log.error("BadCredentialsException {}",ex.getMessage());
+        return ErrorResponse(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.Forbidden.class)
     public ResponseEntity<Void> handleUnauthorizedException(HttpClientErrorException.Unauthorized ex) {
         log.error("Unauthorized Exception {}",ex.getMessage());
-        return ErrorResponse(HttpStatus.UNAUTHORIZED);
+        return ErrorResponse(HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
