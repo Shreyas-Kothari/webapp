@@ -1,7 +1,6 @@
 package com.shreyas.CloudDemo.controller;
 
 import com.shreyas.CloudDemo.bean.UserBean;
-import com.shreyas.CloudDemo.entity.User;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +8,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class UserController extends BaseController {
 
     @GetMapping("self")
     public ResponseEntity<UserBean> login(Authentication authentication) {
-        String emailId = ((User) authentication.getPrincipal()).getEmail();
+        String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
         UserBean userFound = userService.findByEmail(emailId);
         if (userFound != null) {
             return SuccessResponse(userFound);
@@ -40,7 +40,7 @@ public class UserController extends BaseController {
 
     @PutMapping(value = "self")
     public ResponseEntity<UserBean> updateUser(Authentication authentication, @RequestBody @Valid UserBean user) throws BadRequestException {
-        String emailId = ((User) authentication.getPrincipal()).getEmail();
+        String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
         if (!userService.isExistingUserByEmail(emailId))
             throw new BadRequestException("User not found.");
 
