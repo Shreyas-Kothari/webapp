@@ -1,7 +1,6 @@
 package com.shreyas.CloudDemo.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,50 +9,33 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 @Slf4j
 public abstract class BaseController {
     protected ResponseEntity<Void> SuccessResponse() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_LENGTH, "0");
-        return ResponseEntity.ok()
-                .headers(headers)
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     protected <T> ResponseEntity<T> SuccessResponse(T body) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(body.toString().length()));
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(body);
+        return ResponseEntity.ok().body(body);
+    }
+
+    protected <T> ResponseEntity<T> CreatedResponse(T body) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
     }
 
     protected ResponseEntity<Void> ErrorResponse(HttpStatus status) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_LENGTH, "0");
-        return ResponseEntity.status(status)
-                .headers(headers)
-                .build();
+        log.error("Error response with status {}", status);
+        return ResponseEntity.status(status).build();
     }
 
     protected <T> ResponseEntity<T> ErrorResponse(HttpStatus status, T body) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(body.toString().length()));
-        return ResponseEntity.status(status)
-                .headers(headers)
-                .body(body);
+        log.error("Error response with status: {} and body: {}", status, body);
+        return ResponseEntity.status(status).body(body);
     }
 
-    protected <T> ResponseEntity<T> NoContentFoundResponse() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_LENGTH, "0");
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .headers(headers)
-                .build();
+    protected <T> ResponseEntity<T> NoContentFoundResponse(String message) {
+        return (ResponseEntity<T>) ResponseEntity.status(HttpStatus.NO_CONTENT).body(message);
     }
 
     protected <T> ResponseEntity<T> ExceptionResponse(Exception ex) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_LENGTH, "0");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .headers(headers)
-                .build();
+        log.error("Unexpected Exception occurred: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }
