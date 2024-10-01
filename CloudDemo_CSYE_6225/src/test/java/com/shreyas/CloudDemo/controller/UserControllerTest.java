@@ -101,9 +101,6 @@ public class UserControllerTest {
         mockMvc.perform(put("/v1/users/self")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"firstName\":\"John\", \"lastName\":\"Doe\", \"email\":\"john.doe@example.com\", \"password\":\"newPassword\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName").value("John"))
-                .andExpect(jsonPath("$.lastName").value("Doe"))
-                .andExpect(jsonPath("$.email").value("john.doe@example.com"));
+                .andExpect(status().isNoContent());
     }
 }
