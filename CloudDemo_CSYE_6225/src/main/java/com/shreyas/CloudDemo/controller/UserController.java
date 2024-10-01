@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController extends BaseController {
     private final UserService userService;
 
+    @PreAuthorize("permitAll()")
     @PostMapping
     public ResponseEntity<UserBean> createUser(@RequestBody @Valid UserBean user) throws BadRequestException {
 
