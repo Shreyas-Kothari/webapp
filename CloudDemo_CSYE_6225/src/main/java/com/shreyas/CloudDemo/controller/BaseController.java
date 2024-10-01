@@ -16,6 +16,10 @@ public abstract class BaseController {
         return ResponseEntity.ok().body(body);
     }
 
+    protected <T> ResponseEntity<T> CreatedResponse(T body) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
     protected ResponseEntity<Void> ErrorResponse(HttpStatus status) {
         log.error("Error response with status {}", status);
         return ResponseEntity.status(status).build();
