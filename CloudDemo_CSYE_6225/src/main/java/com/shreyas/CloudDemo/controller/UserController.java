@@ -37,7 +37,7 @@ public class UserController extends BaseController {
         if (userFound != null) {
             return SuccessResponse(userFound);
         }
-        return NoContentFoundResponse("User not found");
+        return NoContentResponse();
     }
 
     @PutMapping(value = "self")
@@ -46,8 +46,8 @@ public class UserController extends BaseController {
         if (!userService.isExistingUserByEmail(emailId))
             throw new BadRequestException("User not found.");
 
-        UserBean updatedUser = userService.updateUser(emailId, user);
-        return SuccessResponse(updatedUser);
+        userService.updateUser(emailId, user);
+        return NoContentResponse();
 
     }
 

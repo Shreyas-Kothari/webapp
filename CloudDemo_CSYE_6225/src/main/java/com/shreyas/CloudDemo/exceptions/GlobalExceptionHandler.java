@@ -14,6 +14,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.sql.SQLException;
@@ -24,33 +25,40 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final View error;
+
+    public GlobalExceptionHandler(View error) {
+        this.error = error;
+    }
+
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Map<String, String>> handleSQLException(SQLException ex) {
-        log.error("SQLException: {}", ex.getMessage());
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Database Error");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+        log.error("SQLException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
 
     // Handle general Authentication exceptions
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException ex) {
-        log.error("AuthenticationException: {}", ex.getMessage());
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Authentication Failed");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        log.error("AuthenticationException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     // Handle Bad Credentials exceptions
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException ex) {
-        log.error("BadCredentialsException: {}", ex.getMessage());
+
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Invalid Credentials");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        log.error("BadCredentialsException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     // Handle access denied exceptions
@@ -60,37 +68,38 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Access Denied");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+        log.error("AccessDeniedException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     // Handle UsernameNotFoundException exceptions
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        log.error("UsernameNotFoundException: {}", ex.getMessage());
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "User Not Found");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        log.error("UsernameNotFoundException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     // Handle HttpRequestMethodNotSupportedException
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Map<String, String>> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-        log.error("HttpRequestMethodNotSupportedException: {}", ex.getMessage());
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Method Not Allowed");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(errorResponse);
+        log.error("HttpRequestMethodNotSupportedException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
     }
 
     // Handle resource not found exceptions
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, String>> handleNoResourceFoundException(NoResourceFoundException ex) {
-        log.error("NoResourceFoundException: {}", ex.getMessage());
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Resource Not Found");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        log.error("NoResourceFoundException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     // Handle BadRequest exceptions
@@ -100,7 +109,8 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Bad Request");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        log.error("BadRequestException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -112,7 +122,8 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.badRequest().body(errors);
+        log.error("MethodArgumentNotValidException: {}", errors);
+        return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -121,7 +132,8 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Invalid Request Body");
         errorResponse.put("message", ex.getMessage());
-        return ResponseEntity.badRequest().body(errorResponse);
+        log.error("HttpMessageNotReadableException: {}", errorResponse);
+        return ResponseEntity.badRequest().build();
     }
 
     // Handle unexpected exceptions

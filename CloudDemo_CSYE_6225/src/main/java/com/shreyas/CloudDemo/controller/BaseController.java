@@ -30,8 +30,8 @@ public abstract class BaseController {
         return ResponseEntity.status(status).body(body);
     }
 
-    protected <T> ResponseEntity<T> NoContentFoundResponse(String message) {
-        return (ResponseEntity<T>) ResponseEntity.status(HttpStatus.NO_CONTENT).body(message);
+    protected <T> ResponseEntity<T> NoContentResponse() {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     protected <T> ResponseEntity<T> ExceptionResponse(Exception ex) {
