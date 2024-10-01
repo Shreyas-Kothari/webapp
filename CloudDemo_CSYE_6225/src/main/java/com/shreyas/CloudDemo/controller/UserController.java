@@ -44,9 +44,6 @@ public class UserController extends BaseController {
         if (!userService.isExistingUserByEmail(emailId))
             throw new BadRequestException("User not found.");
 
-        if(user.getEmail() != null || user.getAccount_updated() != null || user.getAccount_created() != null)
-            throw new BadRequestException("You are not allowed to update emailId");
-
         UserBean updatedUser = userService.updateUser(emailId, user);
         return SuccessResponse(updatedUser);
 

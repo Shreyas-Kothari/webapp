@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -48,13 +49,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public UserBean updateUser(String emailId, UserBean updatedUser) {
+    public UserBean updateUser(String emailId, UserBean updatedUser) throws BadRequestException {
         User existingUser = userRepo.findByEmail(emailId).orElseThrow(() -> new RuntimeException("User not found"));
         existingUser.setFirstName(updatedUser.getFirstName());
         existingUser.setLastName(updatedUser.getLastName());
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
+
+        if(!Objects.equals(updatedUser.getEmail(), existingUser.getEmail()))
+            throw new BadRequestException("User Cannot update the email id after creating a new user.");
+
         userRepo.save(existingUser);
         return GenericBeanMapper.map(existingUser, UserBean.class, mapper);
     }
