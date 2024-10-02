@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "Resource Not Found");
         errorResponse.put("message", ex.getMessage());
         log.error("NoResourceFoundException: {}", errorResponse);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     // Handle BadRequest exceptions
