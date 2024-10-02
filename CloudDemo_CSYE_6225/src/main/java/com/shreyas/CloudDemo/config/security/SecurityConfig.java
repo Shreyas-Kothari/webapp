@@ -21,10 +21,10 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         (requests ->
                                 requests
-                                        .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
-                                        .requestMatchers(HttpMethod.POST,"/v*/users/**").permitAll()
-                                        .requestMatchers("/healthz").permitAll()
-                                        .anyRequest().authenticated()
+//                                        .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
+//                                        .requestMatchers(HttpMethod.POST,"/v*/users/**").permitAll()
+//                                        .requestMatchers("/healthz").permitAll()
+                                        .anyRequest().permitAll()
                         ))
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)

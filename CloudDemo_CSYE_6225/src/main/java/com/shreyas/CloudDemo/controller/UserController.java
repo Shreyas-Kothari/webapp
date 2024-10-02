@@ -30,8 +30,13 @@ public class UserController extends BaseController {
 
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("self")
-    public ResponseEntity<UserBean> login(Authentication authentication) {
+    public ResponseEntity<UserBean> login(Authentication authentication, @RequestBody(required = false) Object user) throws BadRequestException{
+
+        if(user!=null)
+            throw new BadRequestException("Request body is not required.");
+
         String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
         UserBean userFound = userService.findByEmail(emailId);
         if (userFound != null) {
@@ -40,6 +45,7 @@ public class UserController extends BaseController {
         return NoContentResponse();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping(value = "self")
     public ResponseEntity<UserBean> updateUser(Authentication authentication, @RequestBody @Valid UserBean user) throws BadRequestException {
         String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
