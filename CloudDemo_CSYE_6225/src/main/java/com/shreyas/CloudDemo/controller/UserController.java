@@ -22,8 +22,8 @@ public class UserController extends BaseController {
     @PostMapping
     public ResponseEntity<UserBean> createUser(@RequestBody @Valid UserBean user) throws BadRequestException {
 
-        if (userService.isExistingUserByEmail(user.getEmail()))
-            throw new BadRequestException("User already exists with this email address.");
+        if(user.getEmail()==null)
+            throw new BadRequestException("Email cannot be empty.");
 
         user = userService.createUser(user);
         return CreatedResponse(user);
@@ -43,6 +43,10 @@ public class UserController extends BaseController {
     @PutMapping(value = "self")
     public ResponseEntity<UserBean> updateUser(Authentication authentication, @RequestBody @Valid UserBean user) throws BadRequestException {
         String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        if(user.getEmail() != null)
+            throw new BadRequestException("Email cannot be updated.");
+
         if (!userService.isExistingUserByEmail(emailId))
             throw new BadRequestException("User not found.");
 

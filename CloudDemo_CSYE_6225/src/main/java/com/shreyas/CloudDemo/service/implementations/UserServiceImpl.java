@@ -8,6 +8,7 @@ import com.shreyas.CloudDemo.utility.GenericBeanMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +25,12 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public UserBean createUser(UserBean user) throws BadRequestException {
-        if (userRepo.findByEmail(user.getEmail()).isPresent()) {
-            throw new BadRequestException("User already exists");
+
+        if(user.getAccount_created()!=null || user.getAccount_updated()!=null)
+            throw new BadRequestException("Account create/update date cannot be set by user.");
+
+        if (isExistingUserByEmail(user.getEmail())) {
+            throw new BadRequestException("User already exists with email id: " + user.getEmail());
         }
 
         User u = GenericBeanMapper.map(user, User.class, mapper);
@@ -50,15 +55,15 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public UserBean updateUser(String emailId, UserBean updatedUser) throws BadRequestException {
-        User existingUser = userRepo.findByEmail(emailId).orElseThrow(() -> new RuntimeException("User not found"));
+        if(updatedUser.getAccount_created()!=null || updatedUser.getAccount_updated()!=null)
+            throw new BadRequestException("Account create/update date cannot be set by user.");
+
+        User existingUser = userRepo.findByEmail(emailId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         existingUser.setFirstName(updatedUser.getFirstName());
         existingUser.setLastName(updatedUser.getLastName());
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
-
-        if(!Objects.equals(updatedUser.getEmail(), existingUser.getEmail()))
-            throw new BadRequestException("User Cannot update the email id after creating a new user.");
 
         userRepo.save(existingUser);
         return GenericBeanMapper.map(existingUser, UserBean.class, mapper);
