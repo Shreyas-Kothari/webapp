@@ -2,9 +2,11 @@ package com.shreyas.CloudDemo.controller;
 
 import com.shreyas.CloudDemo.bean.UserBean;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,24 +20,34 @@ import org.springframework.web.bind.annotation.*;
 public class UserController extends BaseController {
     private final UserService userService;
 
-    @PreAuthorize("permitAll()")
-    @PostMapping
-    public ResponseEntity<UserBean> createUser(@RequestBody @Valid UserBean user) throws BadRequestException {
+    @RequestMapping(path = "", method = {RequestMethod.HEAD, RequestMethod.OPTIONS})
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public void unSupportedMethods() {
+    }
 
-        if(user.getEmail()==null)
+    @RequestMapping(path = "/self", method = {RequestMethod.HEAD, RequestMethod.OPTIONS})
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public void unSupportedMethodsForSelf() {
+    }
+
+
+    @PreAuthorize("permitAll()")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserBean> createUser(HttpServletRequest request, @RequestBody @Valid UserBean user) throws BadRequestException {
+        if (!request.getParameterMap().isEmpty())
+            throw new BadRequestException("Request Param not allowed");
+
+        if (user.getEmail() == null)
             throw new BadRequestException("Email cannot be empty.");
 
         user = userService.createUser(user);
         return CreatedResponse(user);
-
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("self")
-    public ResponseEntity<UserBean> login(Authentication authentication, @RequestBody(required = false) Object user) throws BadRequestException{
-
-        if(user!=null)
-            throw new BadRequestException("Request body is not required.");
+    @GetMapping("/self")
+    public ResponseEntity<UserBean> getUserDetails(HttpServletRequest request, Authentication authentication) throws BadRequestException {
+        if (request.getContentLength() > 0 || !request.getParameterMap().isEmpty())
+            throw new BadRequestException("Request Body/Param not allowed");
 
         String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
         UserBean userFound = userService.findByEmail(emailId);
@@ -45,12 +57,14 @@ public class UserController extends BaseController {
         return NoContentResponse();
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping(value = "self")
-    public ResponseEntity<UserBean> updateUser(Authentication authentication, @RequestBody @Valid UserBean user) throws BadRequestException {
+    @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserBean> updateUser(HttpServletRequest request, Authentication authentication, @RequestBody @Valid UserBean user) throws BadRequestException {
+        if (!request.getParameterMap().isEmpty())
+            throw new BadRequestException("Request param not allowed");
+
         String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
 
-        if(user.getEmail() != null)
+        if (user.getEmail() != null)
             throw new BadRequestException("Email cannot be updated.");
 
         if (!userService.isExistingUserByEmail(emailId))

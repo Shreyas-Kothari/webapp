@@ -25,12 +25,6 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final View error;
-
-    public GlobalExceptionHandler(View error) {
-        this.error = error;
-    }
-
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Map<String, String>> handleSQLException(SQLException ex) {
         Map<String, String> errorResponse = new HashMap<>();
