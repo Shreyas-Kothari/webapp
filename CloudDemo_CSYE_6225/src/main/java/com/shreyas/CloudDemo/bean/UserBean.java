@@ -20,7 +20,7 @@ public class UserBean {
     private String lastName;
 
     @Size( min = 1, message = "Email can not be empty")
-    @Email(message = "Invalid email address")
+    @Email(message = "Invalid email address", regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
     private String email;
 
     @NotNull(message = "Password must not be null")
