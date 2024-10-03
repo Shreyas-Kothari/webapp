@@ -5,6 +5,7 @@ import com.shreyas.CloudDemo.bean.UserBean;
 import com.shreyas.CloudDemo.config.TestSecurityConfig;
 import com.shreyas.CloudDemo.entity.User;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -66,7 +67,7 @@ public class UserControllerTest {
 
     @Test
     void createUser_ShouldReturnBadRequest_WhenUserAlreadyExists() throws Exception {
-        when(userService.isExistingUserByEmail(userBean.getEmail())).thenReturn(true);
+        when(userService.createUser(userBean)).thenThrow(new BadRequestException());
 
         mockMvc.perform(post("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +101,7 @@ public class UserControllerTest {
         // Perform the request and validate the response
         mockMvc.perform(put("/v1/users/self")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"firstName\":\"John\", \"lastName\":\"Doe\", \"email\":\"john.doe@example.com\", \"password\":\"newPassword\"}"))
+                        .content("{\"firstName\":\"John\", \"lastName\":\"Doe\", \"password\":\"newPassword\"}"))
                 .andExpect(status().isNoContent());
     }
 }

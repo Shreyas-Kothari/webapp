@@ -14,7 +14,6 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.sql.SQLException;
@@ -24,12 +23,6 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-    private final View error;
-
-    public GlobalExceptionHandler(View error) {
-        this.error = error;
-    }
 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Map<String, String>> handleSQLException(SQLException ex) {
@@ -99,7 +92,7 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "Resource Not Found");
         errorResponse.put("message", ex.getMessage());
         log.error("NoResourceFoundException: {}", errorResponse);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     // Handle BadRequest exceptions
