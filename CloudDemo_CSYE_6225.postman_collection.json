@@ -1,25 +1,179 @@
 {
 	"info": {
-		"_postman_id": "0d14dac7-d8dc-4478-be44-80e8250eadd5",
+		"_postman_id": "840bb4ae-2598-4a64-afef-3c6a86977fde",
 		"name": "CloudDemo_CSYE_6225",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "17559906"
 	},
 	"item": [
 		{
+			"name": "users",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Shreyas\",\r\n  \"lastName\": \"Rai2\",\r\n  \"email\": \"shreya@gmail.com\",\r\n  \"password\": \"shreyas@1\",\r\n  \"account_created\": \"     \"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{publicURL}}:8080/v1/users",
+							"protocol": "http",
+							"host": [
+								"{{publicURL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "huh",
+									"value": "junn",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "shreyas@1",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "shreyas@gmail.com",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Shreyas\",\r\n  \"lastName\": \"Kothari\",\r\n  \"password\": \"shreyas@1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{publicURL}}:8080/v1/users/self",
+							"protocol": "http",
+							"host": [
+								"{{publicURL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"users",
+								"self"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Information",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "shrey@gmail.com",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "shreyas@1",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{publicURL}}:8080/v1/users/self",
+							"protocol": "http",
+							"host": [
+								"{{publicURL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"users",
+								"self"
+							],
+							"query": [
+								{
+									"key": "njn",
+									"value": "jj",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "healthz",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8001/healthz",
+					"raw": "http://{{publicURL}}:8080/healthz",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{publicURL}}"
 					],
-					"port": "8001",
+					"port": "8080",
 					"path": [
 						"healthz"
+					],
+					"query": [
+						{
+							"key": "huh",
+							"value": "uhu",
+							"disabled": true
+						}
 					]
 				}
 			},

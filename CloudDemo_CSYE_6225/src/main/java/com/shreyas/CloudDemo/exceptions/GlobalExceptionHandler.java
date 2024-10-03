@@ -10,6 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -85,6 +86,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
     }
 
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<Map<String, String>> handleMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex){
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Unsupported Media Type");
+        errorResponse.put("message", ex.getMessage());
+        log.error("HttpMediaTypeNotSupportedException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+    }
+
     // Handle resource not found exceptions
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, String>> handleNoResourceFoundException(NoResourceFoundException ex) {
@@ -107,7 +117,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         log.error("MethodArgumentNotValidException: {}", ex.getMessage());
         ex.getBindingResult().getAllErrors().forEach(error -> {
