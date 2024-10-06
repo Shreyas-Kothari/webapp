@@ -1,0 +1,11 @@
+name: Pull request check for tf-aws-infra repo
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
