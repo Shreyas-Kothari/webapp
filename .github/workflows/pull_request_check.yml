@@ -1,11 +1,36 @@
-name: Pull request check for tf-aws-infra repo
+name: Pull request check for webapp repo
 on:
   pull_request:
     branches:
       - main
 jobs:
-  terraform:
+  build_test_java_app:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run with Maven
+        working-directory: ./CloudDemo_CSYE_6225
+        run: mvn clean install
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/test_db
+          SPRING_DATASOURCE_USERNAME: test_user
+          SPRING_DATASOURCE_PASSWORD: test_password
