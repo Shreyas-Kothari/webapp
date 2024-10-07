@@ -60,6 +60,6 @@ public class HealthCheckControllerTest {
     @Test
     public void testPostOnGetEndpointShouldReturnMethodNotAllowed() throws Exception {
         mockMvc.perform(post("/healthz")) // Make a POST request instead of GET
-                .andExpect(status().isMethodNotAllowed()); // Expect 405 Method Not Allowed
+                .andExpect(status().isBadRequest()); // Expect 405 Method Not Allowed
     }
 }

@@ -135,7 +135,7 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "Invalid Request Body");
         errorResponse.put("message", ex.getMessage());
-        log.error("HttpMessageNotReadableException: {}", errorResponse)
+        log.error("HttpMessageNotReadableException: {}", errorResponse);
         return ResponseEntity.badRequest().build();
     }
 
