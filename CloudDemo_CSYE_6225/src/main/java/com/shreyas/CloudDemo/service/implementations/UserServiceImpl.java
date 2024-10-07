@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserBean createUser(UserBean user) throws BadRequestException {
 
-        if(user.getAccount_created()!=null || user.getAccount_updated()!=null)
+        if (user.getAccount_created() != null || user.getAccount_updated() != null)
             throw new BadRequestException("Account create/update date cannot be set by user.");
 
         if (isExistingUserByEmail(user.getEmail())) {
@@ -55,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public UserBean updateUser(String emailId, UserBean updatedUser) throws BadRequestException {
-        if(updatedUser.getAccount_created()!=null || updatedUser.getAccount_updated()!=null)
+        if (updatedUser.getAccount_created() != null || updatedUser.getAccount_updated() != null)
             throw new BadRequestException("Account create/update date cannot be set by user.");
 
         User existingUser = userRepo.findByEmail(emailId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
