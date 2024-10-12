@@ -34,3 +34,21 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/test_db
           SPRING_DATASOURCE_USERNAME: test_user
           SPRING_DATASOURCE_PASSWORD: test_password
+
+  packer_pr_check:
+    defaults:
+      run:
+        working-directory: ./packer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v3
+
+      - name: Packer fmt check
+        run: packer fmt -check -recursive .
+
+      - name: Validate Packer template
+        run: packer validate .
