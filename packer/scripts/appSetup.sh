@@ -8,7 +8,7 @@ echo "==> Setting up the application ==>"
 
 sudo cp "$PATH" /opt/myapp/app.jar
 
-sudo mv app.service /etc/systemd/system/myapp.service
+sudo mv app.service /etc/systemd/system/app.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable myapp
