@@ -47,6 +47,9 @@ jobs:
       - name: Set up Packer
         uses: hashicorp/setup-packer@v3
 
+      - name: Init Packer
+        run: packer init .
+
       - name: Packer fmt check
         run: packer fmt -check -recursive .
 
