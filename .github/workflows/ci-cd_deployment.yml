@@ -2,14 +2,13 @@ name: Packer image build and deploy
 on:
   push:
     branches:
-      - amain
+      - main
 
 jobs:
   build_ami:
     name: Build and deploy Custom AMI
     runs-on: ubuntu-latest
-    environment:
-      name: dev
+    environment: dev
     services:
       mysql:
         image: mysql:8.0
@@ -32,9 +31,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Reading secrets and env vars
+        run: echo "DB_URL=${{ secrets.DB_URL }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}, JAR_NAME=${{ env.JAR_NAME }}"
+  
+
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
-        run: mvn clean package -DfinalName=${{ env.JAR_NAME }}
+        run: mvn clean package -DfinalName=app
         env:
           SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
@@ -45,7 +48,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: "us-east-1"
 
       - name: Set up Packer
         uses: hashicorp/setup-packer@v3
