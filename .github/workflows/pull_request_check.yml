@@ -29,20 +29,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # - name: Check Secrets
-      #   run: |
-      #     if [ -z "${{ secrets.DB_URL }}" ]; then echo "DB_URL isnt set"; else echo "DB_URL is set"; fi
-      #     if [ -z "${{ secrets.DB_USERNAME }}" ]; then echo "DB_USERNAME is not set"; else echo "DB_USERNAME is set"; fi
-      #     if [ -z "${{ secrets.DB_PASSWORD }}" ]; then echo "DB_PASSWORD is not set"; else echo "DB_PASSWORD is set"; fi
+      - name: Check Secrets
+        run: |
+          if [ -z "${{ secrets.DB_URL }}" ]; then echo "DB_URL isnt set"; else echo "DB_URL is set"; fi
+          if [ -z "${{ secrets.DB_USERNAME }}" ]; then echo "DB_USERNAME is not set"; else echo "DB_USERNAME is set"; fi
+          if [ -z "${{ secrets.DB_PASSWORD }}" ]; then echo "DB_PASSWORD is not set"; else echo "DB_PASSWORD is set"; fi
         
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
         run: mvn clean install
         env:
-          SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SPRING_DATASOURCE_URL: "jdbc:mysql://localhost:3306/clouddemo_csye_6225"
+          SPRING_DATASOURCE_USERNAME: ${{ vars.JAR_NAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ vars.JAR_NAME }}
 
   packer_pr_check:
     defaults:
