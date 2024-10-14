@@ -29,6 +29,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Check Secrets
+        run: |
+          if [ -z "${{ secrets.DB_URL }}" ]; then echo "DB_URL is not set"; else echo "DB_URL is set"; fi
+          if [ -z "${{ secrets.DB_USERNAME }}" ]; then echo "DB_USERNAME is not set"; else echo "DB_USERNAME is set"; fi
+          if [ -z "${{ secrets.DB_PASSWORD }}" ]; then echo "DB_PASSWORD is not set"; else echo "DB_PASSWORD is set"; fi
+        
+
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
         run: mvn clean install
