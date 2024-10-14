@@ -7,6 +7,7 @@ on:
       - main
 jobs:
   build_test_java_app:
+    environment: dev
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -28,6 +29,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Reading secrets and env vars
+        run: echo "DB_URL=${{ secrets.DB_URL }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}, JAR_NAME=${{ env.JAR_NAME }}"
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
