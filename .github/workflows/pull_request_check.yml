@@ -8,6 +8,7 @@ on:
 jobs:
   build_test_java_app:
     runs-on: ubuntu-latest
+    environment: dev
     services:
       mysql:
         image: mysql:8.0
@@ -31,7 +32,7 @@ jobs:
 
       - name: Check Secrets
         run: |
-          if [ -z "${{ secrets.DB_URL }}" ]; then echo "DB_URL isnt set"; else echo "DB_URL is set"; fi
+          if [ -z "${{ env.JAR_NAME }}" ]; then echo "JAR_NAME isnt set"; else echo "JAR_NAME is set"; fi
           if [ -z "${{ secrets.DB_USERNAME }}" ]; then echo "DB_USERNAME is not set"; else echo "DB_USERNAME is set"; fi
           if [ -z "${{ secrets.DB_PASSWORD }}" ]; then echo "DB_PASSWORD is not set"; else echo "DB_PASSWORD is set"; fi
         
