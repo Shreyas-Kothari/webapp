@@ -1,11 +1,20 @@
 name: Pull request check for webapp repo
 on:
   pull_request:
+    types: 
+      - opened
     branches:
       - main
+
+env:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://localhost:3306/clouddemo_csye_6225"
+      SPRING_DATASOURCE_USERNAME: test_user
+      SPRING_DATASOURCE_PASSWORD: test_password
 jobs:
   build_test_java_app:
     runs-on: ubuntu-latest
+    environment:
+      name: dev
     services:
       mysql:
         image: mysql:8.0
@@ -27,11 +36,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Checking variables
+        run: echo $SPRING_DATASOURCE_URL $SPRING_DATASOURCE_USERNAME $SPRING_DATASOURCE_PASSWORD
+
+      - name: Checking Environment variables
+        run: echo ${{ env.SPRING_DATASOURCE_URL }} ${{ env.SPRING_DATASOURCE_USERNAME }} ${{ env.SPRING_DATASOURCE_PASSWORD }}
+
+      - name: Set JAR_NAME environment variable
+        run: echo "JAR_NAME=${{ env.JAR_NAME }}"
+
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
         run: mvn clean install
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/test_db
+          SPRING_DATASOURCE_URL: "jdbc:mysql://localhost:3306/clouddemo_csye_6225"
           SPRING_DATASOURCE_USERNAME: test_user
           SPRING_DATASOURCE_PASSWORD: test_password
 

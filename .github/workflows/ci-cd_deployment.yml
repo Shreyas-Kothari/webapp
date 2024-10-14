@@ -1,10 +1,8 @@
 name: Packer image build and deploy
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
-      - main
+      - aain          # Change this to your branch name
 
 jobs:
   build_ami:
