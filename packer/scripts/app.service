@@ -1,0 +1,15 @@
+[Unit]
+Description=CSYE6225 Spring Boot App
+After=network.target
+
+[Service]
+Type=simple
+User=csye6225
+Group=csye6225
+WorkingDirectory=/opt/myapp
+ExecStart=java -jar /opt/myapp/app.jar
+SuccessExitStatus=143
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
