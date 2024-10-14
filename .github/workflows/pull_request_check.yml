@@ -8,6 +8,8 @@ on:
 jobs:
   build_test_java_app:
     runs-on: ubuntu-latest
+    environment:
+      name: dev
     services:
       mysql:
         image: mysql:8.0
@@ -28,6 +30,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: checking the env vars and secrets for secrets
+        run: echo "${{ secrets.DB_URL }} - ${{ env.AWS_REGION }}"
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
