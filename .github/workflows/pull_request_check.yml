@@ -1,6 +1,8 @@
 name: Pull request check for webapp repo
 on:
   pull_request:
+    types: 
+      - opened
     branches:
       - main
 jobs:
