@@ -8,8 +8,7 @@ on:
 jobs:
   build_test_java_app:
     runs-on: ubuntu-latest
-    environment:
-      name: dev
+    environment: dev
     services:
       mysql:
         image: mysql:8.0
