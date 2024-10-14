@@ -48,3 +48,8 @@ variable DB_PASSWORD {
   type    = string
   default = "admin"
 }
+
+variable ARTIFACT_PATH {
+  type    = string
+  default = "./CloudDemo_CSYE_6225/target/*.jar"
+}
