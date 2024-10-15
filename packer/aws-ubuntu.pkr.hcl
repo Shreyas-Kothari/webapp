@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "shreyas-ubuntu" {
-  ami_name        = "Shreyas Ubuntu ${formatdate("YYYY_MM_DD", timestamp())}"
+  ami_name        = "Shreyas Ubuntu ${formatdate("YYYY_MM_DD-HH", timestamp())}"
   ami_description = "AMI for CSYE 6225 A04 created at ${formatdate("YYYY/MM/DD HH:mm", timestamp())} by Packer"
   instance_type   = "${var.instance_type}"
   region          = "${var.aws_region}"
@@ -57,13 +57,16 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "ARTIFACT_PATH=${var.ARTIFACT_PATH}"
-    ]
-    script = "scripts/appSetup.sh"
+    script = "scripts/appDirSetup.sh"
   }
 
-  provisioner "shell" {
-    script = "scripts/appDirSetup.sh"
+  provisioner "file" {
+    source      = "../CloudDemo_CSYE_6225/target/app.jar"
+    destination = "/opt/myapp/"
+  }
+
+  provisioner "file" {
+    sources     = ["./scripts/app.service"]
+    destination = "/tmp/"
   }
 }

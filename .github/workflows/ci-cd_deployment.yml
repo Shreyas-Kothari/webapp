@@ -8,7 +8,6 @@ jobs:
   build_ami:
     name: Build and deploy Custom AMI
     runs-on: ubuntu-latest
-    environment: dev
     services:
       mysql:
         image: mysql:8.0
@@ -37,7 +36,10 @@ jobs:
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
-        run: mvn clean package -DfinalName=app
+        run: |
+          mvn clean package -DfinalName=app
+          pwd
+
         env:
           SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}

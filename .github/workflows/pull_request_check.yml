@@ -1,13 +1,10 @@
 name: Pull request check for webapp repo
 on:
   pull_request:
-    types: 
-      - opened
     branches:
       - main
 jobs:
   build_test_java_app:
-    environment: dev
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -35,29 +32,23 @@ jobs:
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
-        run: mvn clean install
+        run: mvn clean package -DfinalName=app
         env:
           SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-  packer_pr_check:
-    defaults:
-      run:
-        working-directory: ./packer
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Set up Packer
         uses: hashicorp/setup-packer@v3
 
       - name: Init Packer
+        working-directory: ./packer
         run: packer init .
 
       - name: Packer fmt check
+        working-directory: ./packer
         run: packer fmt -check -recursive .
 
       - name: Validate Packer template
+        working-directory: ./packer
         run: packer validate .
