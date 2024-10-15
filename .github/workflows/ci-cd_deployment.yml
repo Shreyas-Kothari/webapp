@@ -58,20 +58,15 @@ jobs:
         run: packer init .
 
       - name: Packer Validate
-        run: packer validate . \
-          -var 'DB_URL=${{ secrets.DB_URL }}' \
-          -var 'DB_NAME=${{ secrets.DB_NAME }}' \
-          -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
-          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' \
-          -var 'ARTIFACT_PATH=./CloudDemo_CSYE_6225/target/app.jar'
+        working-directory: ./packer
+        run: packer validate .
+          # -var 'DB_URL=${{ secrets.DB_URL }}' \
+          # -var 'DB_NAME=${{ secrets.DB_NAME }}' \
+          # -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
+          # -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' \
+          # -var 'ARTIFACT_PATH=./CloudDemo_CSYE_6225/target/app.jar'
 
       - name: Build Custom AMI with Packer
         working-directory: ./packer
-        run: |
-          packer build . \
-            -var 'DB_URL=${{ secrets.DB_URL }}' \
-            -var 'DB_NAME=${{ secrets.DB_NAME }}' \
-            -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
-            -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' \
-            -var 'ARTIFACT_PATH=./CloudDemo_CSYE_6225/target/app.jar'
+        run: packer build .
     
