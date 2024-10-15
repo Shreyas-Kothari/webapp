@@ -61,18 +61,18 @@ jobs:
       - name: Packer Validate
         working-directory: ./packer
         run: |
-          packer validate . \
+          packer validate \
           -var 'DB_URL=${{ secrets.DB_URL }}' \
           -var 'DB_NAME=${{ secrets.DB_NAME }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
-          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}'
+          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' .
 
       - name: Build Custom AMI with Packer
         working-directory: ./packer
         run: |
-          packer build . \
+          packer build \
           -var 'DB_URL=${{ secrets.DB_URL }}' \
           -var 'DB_NAME=${{ secrets.DB_NAME }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
-          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}'
+          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' .
     

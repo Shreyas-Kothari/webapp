@@ -30,22 +30,22 @@ variable ami_users {
 }
 
 variable DB_URL {
-  type    = string
+  type = string
   default = "jdbc:mysql://localhost:3306/clouddemo_csye_6225"
 }
 
 variable DB_NAME {
-  type    = string
+  type = string
   default = "clouddemo_csye_6225"
 }
 
 variable DB_USERNAME {
-  type    = string
+  type = string
   default = "admin"
 }
 
 variable DB_PASSWORD {
-  type    = string
+  type = string
   default = "admin"
 }
 

@@ -52,8 +52,8 @@ jobs:
       - name: Validate Packer template
         working-directory: ./packer
         run: |
-          packer validate . \
+          packer validate \
           -var 'DB_URL=${{ secrets.DB_URL }}' \
           -var 'DB_NAME=${{ secrets.DB_NAME }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
-          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}'
+          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' .
