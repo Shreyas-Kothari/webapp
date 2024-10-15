@@ -10,15 +10,14 @@ echo "==> Updating the ubuntu system ==>"
 # update the ubuntu
 sudo apt-get update
 
-sleep 10
+sleep 5
 
 sudo apt-get upgrade -y
 
-sleep 10
+sleep 5
 
-echo "==> Ubuntu system updated successfully ==>"
 echo "==> Cleaning up the ubuntu system ==>"
 # cleanup pkg
 sudo apt-get clean
 echo "==> Ubuntu system cleaned up successfully ==>"
-sleep 10
+sleep 5
