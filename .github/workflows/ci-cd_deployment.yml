@@ -30,9 +30,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Reading secrets and env vars
-        run: echo "DB_URL=${{ secrets.DB_URL }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}, JAR_NAME=${{ env.JAR_NAME }}"
-  
+      # - name: Reading secrets and env vars
+      #   run: echo "DB_URL=${{ secrets.DB_URL }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}, JAR_NAME=${{ env.JAR_NAME }}"
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
@@ -61,14 +60,17 @@ jobs:
 
       - name: Packer Validate
         working-directory: ./packer
-        run: packer validate .
-          # -var 'DB_URL=${{ secrets.DB_URL }}' \
-          # -var 'DB_NAME=${{ secrets.DB_NAME }}' \
-          # -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
-          # -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' \
-          # -var 'ARTIFACT_PATH=./CloudDemo_CSYE_6225/target/app.jar'
+        run: packer validate .  \
+          -var 'DB_URL=${{ secrets.DB_URL }}' \
+          -var 'DB_NAME=${{ secrets.DB_NAME }}' \
+          -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
+          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}'
 
       - name: Build Custom AMI with Packer
         working-directory: ./packer
-        run: packer build .
+        run: packer build . \
+          -var 'DB_URL=${{ secrets.DB_URL }}' \
+          -var 'DB_NAME=${{ secrets.DB_NAME }}' \
+          -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
+          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}'
     
