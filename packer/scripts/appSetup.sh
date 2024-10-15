@@ -4,7 +4,12 @@ set -e
 
 PATH=${ARTIFACT_PATH}
 
+# Create the directory
+sudo mkdir -p /opt/myapp
+
 echo "==> Setting up the application ==>"
+
+echo "Copyfile from $PATH to /opt/myapp/app.jar"
 
 sudo cp "$PATH" /opt/myapp/app.jar
 
