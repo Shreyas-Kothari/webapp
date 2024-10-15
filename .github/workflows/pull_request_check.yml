@@ -38,6 +38,21 @@ jobs:
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v3
+
+      - name: Init Packer
+        working-directory: ./packer
+        run: packer init .
+
+      - name: Packer fmt check
+        working-directory: ./packer
+        run: packer fmt -check -recursive .
+
+      - name: Validate Packer template
+        working-directory: ./packer
+        run: packer validate .
+
   packer_pr_check:
     needs: build_test_java_app
     defaults:
@@ -58,7 +73,7 @@ jobs:
         run: packer fmt -check -recursive .
 
       - name: check the current directory
-        run: pwd
+        run: ls ../CloudDemo_CSYE_6225/target
 
       - name: Validate Packer template
         run: packer validate .
