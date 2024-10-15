@@ -10,8 +10,8 @@ echo "Java installed!"
 sleep 10
 
 ## Install Maven
-sudo apt install maven -y
-echo "Maven installed!"
+# sudo apt install maven -y
+# echo "Maven installed!"
 
 sleep 10
 
