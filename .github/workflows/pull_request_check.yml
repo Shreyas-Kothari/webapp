@@ -52,28 +52,3 @@ jobs:
       - name: Validate Packer template
         working-directory: ./packer
         run: packer validate .
-
-  packer_pr_check:
-    needs: build_test_java_app
-    defaults:
-      run:
-        working-directory: ./packer
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Packer
-        uses: hashicorp/setup-packer@v3
-
-      - name: Init Packer
-        run: packer init .
-
-      - name: Packer fmt check
-        run: packer fmt -check -recursive .
-
-      - name: check the current directory
-        run: ls ../CloudDemo_CSYE_6225/target
-
-      - name: Validate Packer template
-        run: packer validate .
