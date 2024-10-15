@@ -67,9 +67,9 @@ build {
     script = "scripts/appDirSetup.sh"
   }
 
-  provisioner "file" {
-    source      = "/home/runner/work/webapp/webapp/app.jar"
-    destination = "/opt/myapp/"
-  }
-  
+  # provisioner "file" {
+  #   source      = "/home/runner/work/webapp/webapp/app.jar"
+  #   destination = "/opt/myapp/"
+  # }
+
 }
