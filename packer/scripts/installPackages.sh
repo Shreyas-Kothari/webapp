@@ -7,19 +7,19 @@ echo "==> Installing packages all the required packages ==>"
 sudo apt install openjdk-17-jdk -y
 echo "Java installed!"
 
-sleep 10
+sleep 5
 
 ## Install Maven
 # sudo apt install maven -y
 # echo "Maven installed!"
 
-sleep 10
+sleep 5
 
 # Install MySQL Server
 echo "Installing MySQL server..."
 sudo apt install mysql-server -y
 
-sleep 10
+sleep 5
 
 # Start and enable MySQL service to start automatically on reboot
 echo "Starting MySQL service..."
