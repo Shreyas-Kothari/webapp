@@ -39,6 +39,7 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
   packer_pr_check:
+    needs: build_test_java_app
     defaults:
       run:
         working-directory: ./packer
