@@ -57,13 +57,13 @@ build {
   }
 
   provisioner "shell" {
-    script = "scripts/appDirSetup.sh"
-  }
-
-  provisioner "shell" {
     environment_vars = [
       "ARTIFACT_PATH=${var.ARTIFACT_PATH}"
     ]
     script = "scripts/appSetup.sh"
+  }
+
+  provisioner "shell" {
+    script = "scripts/appDirSetup.sh"
   }
 }

@@ -14,9 +14,9 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: test_user
-          MYSQL_PASSWORD: test_password
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_USER: ${{ secrets.DB_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -37,9 +37,9 @@ jobs:
         working-directory: ./CloudDemo_CSYE_6225
         run: mvn clean install
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/test_db
-          SPRING_DATASOURCE_USERNAME: test_user
-          SPRING_DATASOURCE_PASSWORD: test_password
+          SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
   packer_pr_check:
     defaults:

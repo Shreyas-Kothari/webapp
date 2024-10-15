@@ -51,5 +51,5 @@ variable DB_PASSWORD {
 
 variable ARTIFACT_PATH {
   type    = string
-  default = "./CloudDemo_CSYE_6225/target/*.jar"
+  default = "./CloudDemo_CSYE_6225/target/app.jar"
 }
