@@ -10,7 +10,7 @@ variable source_ami {
 
 variable instance_type {
   type    = string
-  default = "t2.small"
+  default = "t2.micro"
 }
 
 variable ssh_username {
@@ -49,7 +49,7 @@ variable DB_PASSWORD {
   default = "admin"
 }
 
-variable ARTIFACT_PATH {
+variable environment {
   type    = string
-  default = "../CloudDemo_CSYE_6225/target/app.jar"
+  default = ""
 }

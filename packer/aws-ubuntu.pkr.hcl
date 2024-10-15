@@ -25,7 +25,7 @@ source "amazon-ebs" "shreyas-ubuntu" {
   }
 
   tags = {
-    Name = "shreyas-ubuntu-A04"
+    Name = "${var.environment} Shreyas Ubuntu A04 ${formatdate("YYYY/MM/DD HH:mm", timestamp())}"
   }
 
   launch_block_device_mappings {
