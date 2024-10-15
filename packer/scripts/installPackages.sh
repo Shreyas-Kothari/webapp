@@ -9,12 +9,6 @@ echo "Java installed!"
 
 sleep 5
 
-## Install Maven
-# sudo apt install maven -y
-# echo "Maven installed!"
-
-sleep 5
-
 # Install MySQL Server
 echo "Installing MySQL server..."
 sudo apt install mysql-server -y
@@ -44,8 +38,8 @@ EOF
 echo "MySQL installed and configured successfully!"
 
 # add system variables. used for startup
-echo "export SPRING_DATASOURCE_DB=${DB_NAME}" | sudo tee -a /etc/environment
-echo "export SPRING_DATASOURCE_URL=${DB_URL}" | sudo tee -a /etc/environment
-echo "export SPRING_DATASOURCE_USERNAME=${DB_USERNAME}" | sudo tee -a /etc/environment
-echo "export SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}" | sudo tee -a /etc/environment
+echo "SPRING_DATASOURCE_DB=${DB_NAME}" | sudo tee -a /etc/environment
+echo "SPRING_DATASOURCE_URL=${DB_URL}" | sudo tee -a /etc/environment
+echo "SPRING_DATASOURCE_USERNAME=${DB_USERNAME}" | sudo tee -a /etc/environment
+echo "SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}" | sudo tee -a /etc/environment
 source /etc/environment

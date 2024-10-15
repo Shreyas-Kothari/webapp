@@ -7,6 +7,7 @@ Type=simple
 User=csye6225
 Group=csye6225
 WorkingDirectory=/opt/myapp
+EnvironmentFile=/etc/environment
 ExecStart=java -jar /opt/myapp/app.jar
 SuccessExitStatus=143
 Restart=always

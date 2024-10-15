@@ -7,4 +7,4 @@ sudo mv /tmp/app.service /etc/systemd/system/
 
 sudo systemctl daemon-reload
 sudo systemctl enable app
-sudo systemctl start app
+sudo systemctl restart app
