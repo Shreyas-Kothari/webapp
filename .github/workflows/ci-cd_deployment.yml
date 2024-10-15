@@ -55,9 +55,13 @@ jobs:
         working-directory: ./packer
         run: packer init .
 
+      - name: Check the secrets
+        run: echo "DB_URL=${{ secrets.DB_URL }} DB_NAME=${{ secrets.DB_NAME }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
+
       - name: Packer Validate
         working-directory: ./packer
-        run: packer validate .  \
+        run: |
+          packer validate . \
           -var 'DB_URL=${{ secrets.DB_URL }}' \
           -var 'DB_NAME=${{ secrets.DB_NAME }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
@@ -65,7 +69,8 @@ jobs:
 
       - name: Build Custom AMI with Packer
         working-directory: ./packer
-        run: packer build . \
+        run: |
+          packer build . \
           -var 'DB_URL=${{ secrets.DB_URL }}' \
           -var 'DB_NAME=${{ secrets.DB_NAME }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
