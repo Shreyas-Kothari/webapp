@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "shreyas-ubuntu" {
-  ami_name        = "Shreyas Ubuntu ${formatdate("YYYY_MM_DD-HH", timestamp())}"
+  ami_name        = "Shreyas Ubuntu ${formatdate("YYYY_MM_DD-HH_mm", timestamp())}"
   ami_description = "AMI for CSYE 6225 A04 created at ${formatdate("YYYY/MM/DD HH:mm", timestamp())} by Packer"
   instance_type   = "${var.instance_type}"
   region          = "${var.aws_region}"
@@ -68,5 +68,9 @@ build {
   provisioner "file" {
     sources     = ["./scripts/app.service"]
     destination = "/tmp/"
+  }
+
+  provisioner "shell" {
+    script = "scripts/appSetup.sh"
   }
 }
