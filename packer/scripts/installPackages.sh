@@ -9,12 +9,6 @@ echo "Java installed!"
 
 sleep 5
 
-## Install Maven
-# sudo apt install maven -y
-# echo "Maven installed!"
-
-sleep 5
-
 # Install MySQL Server
 echo "Installing MySQL server..."
 sudo apt install mysql-server -y
