@@ -27,6 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
@@ -108,6 +109,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${finalName}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
