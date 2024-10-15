@@ -56,14 +56,20 @@ build {
     script = "scripts/installPackages.sh"
   }
 
-  provisioner "shell" {
-    environment_vars = [
-      "ARTIFACT_PATH=${var.ARTIFACT_PATH}"
-    ]
-    script = "scripts/appSetup.sh"
-  }
+  # provisioner "shell" {
+  #   environment_vars = [
+  #     "ARTIFACT_PATH=${var.ARTIFACT_PATH}"
+  #   ]
+  #   script = "scripts/appSetup.sh"
+  # }
 
   provisioner "shell" {
     script = "scripts/appDirSetup.sh"
   }
+
+  provisioner "file" {
+    source      = "/home/runner/work/webapp/webapp/app.jar"
+    destination = "/opt/myapp/"
+  }
+  
 }

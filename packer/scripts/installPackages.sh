@@ -49,3 +49,5 @@ echo "export SPRING_DATASOURCE_URL=${DB_URL}" | sudo tee -a /etc/environment
 echo "export SPRING_DATASOURCE_USERNAME=${DB_USERNAME}" | sudo tee -a /etc/environment
 echo "export SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}" | sudo tee -a /etc/environment
 source /etc/environment
+
+# sudo mkdir -p /opt/myapp
