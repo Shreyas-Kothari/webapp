@@ -53,3 +53,18 @@ variable environment {
   type    = string
   default = ""
 }
+
+variable block_device_name {
+  type    = string
+  default = "/dev/sda1"
+}
+
+variable volume_size {
+  type    = number
+  default = 8
+}
+
+variable volume_type {
+  type    = string
+  default = "gp2"
+}

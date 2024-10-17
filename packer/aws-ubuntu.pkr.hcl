@@ -30,9 +30,9 @@ source "amazon-ebs" "shreyas-ubuntu" {
 
   launch_block_device_mappings {
     delete_on_termination = true
-    device_name           = "/dev/sda1"
-    volume_size           = 8
-    volume_type           = "gp2"
+    device_name           = var.block_device_name
+    volume_size           = var.volume_size
+    volume_type           = var.volume_type
   }
 }
 
