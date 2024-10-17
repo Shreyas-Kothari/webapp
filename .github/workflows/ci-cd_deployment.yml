@@ -36,7 +36,7 @@ jobs:
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
-        run: mvn clean package -DfinalName=app
+        run: mvn clean package -DfinalName=${{ vars.JAR_NAME }}
         env:
           SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
