@@ -52,6 +52,7 @@ build {
       "DB_NAME=${var.DB_NAME}",
       "DB_USERNAME=${var.DB_USERNAME}",
       "DB_PASSWORD=${var.DB_PASSWORD}",
+      "ARTIFACT_NAME=${var.ARTIFACT_NAME}"
     ]
     script = "scripts/installPackages.sh"
   }
@@ -61,8 +62,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "../CloudDemo_CSYE_6225/target/app.jar"
-    destination = "/opt/myapp/"
+    source      = "../CloudDemo_CSYE_6225/target/${var.ARTIFACT_NAME}.jar"
+    destination = "/opt/myapp/app.jar"
   }
 
   provisioner "file" {

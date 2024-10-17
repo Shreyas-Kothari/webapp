@@ -68,3 +68,8 @@ variable volume_type {
   type    = string
   default = "gp2"
 }
+
+variable ARTIFACT_NAME {
+  type    = string
+  default = "app"
+}
