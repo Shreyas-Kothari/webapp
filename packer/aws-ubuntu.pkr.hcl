@@ -30,9 +30,9 @@ source "amazon-ebs" "shreyas-ubuntu" {
 
   launch_block_device_mappings {
     delete_on_termination = true
-    device_name           = "/dev/sda1"
-    volume_size           = 8
-    volume_type           = "gp2"
+    device_name           = var.block_device_name
+    volume_size           = var.volume_size
+    volume_type           = var.volume_type
   }
 }
 
@@ -52,6 +52,7 @@ build {
       "DB_NAME=${var.DB_NAME}",
       "DB_USERNAME=${var.DB_USERNAME}",
       "DB_PASSWORD=${var.DB_PASSWORD}",
+      "ARTIFACT_NAME=${var.ARTIFACT_NAME}"
     ]
     script = "scripts/installPackages.sh"
   }
@@ -61,8 +62,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "../CloudDemo_CSYE_6225/target/app.jar"
-    destination = "/opt/myapp/"
+    source      = "../CloudDemo_CSYE_6225/target/${var.ARTIFACT_NAME}.jar"
+    destination = "/opt/myapp/app.jar"
   }
 
   provisioner "file" {

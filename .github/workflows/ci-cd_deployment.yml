@@ -7,6 +7,7 @@ on:
 jobs:
   build_ami:
     name: Build and deploy Custom AMI
+    environment: dev
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -74,5 +75,11 @@ jobs:
           -var 'DB_URL=${{ secrets.DB_URL }}' \
           -var 'DB_NAME=${{ secrets.DB_NAME }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
-          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' .
+          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' \
+          -var 'aws_region=${{ vars.AWS_REGION }}' \
+          -var 'ami_users=${{ vars.AWS_ACCOUNT_DEMO_ID }}' \
+          -var 'source_ami=${{ vars.SOURCE_AMI }}' \
+          -var 'subnet_id=${{ vars.SUBNET_ID }}' \
+          -var 'environment=${{ vars.ENVIRONMENT_NAME }}' \
+          -var 'ARTIFACT_NAME=${{ vars.JAR_NAME }}' .
     
