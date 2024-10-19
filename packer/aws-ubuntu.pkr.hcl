@@ -47,13 +47,6 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "DB_URL=${var.DB_URL}",
-      "DB_NAME=${var.DB_NAME}",
-      "DB_USERNAME=${var.DB_USERNAME}",
-      "DB_PASSWORD=${var.DB_PASSWORD}",
-      "ARTIFACT_NAME=${var.ARTIFACT_NAME}"
-    ]
     script = "scripts/installPackages.sh"
   }
 
