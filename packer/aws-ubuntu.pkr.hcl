@@ -50,14 +50,19 @@ build {
     script = "scripts/installPackages.sh"
   }
 
+  provisioner "file" {
+    source      = "../CloudDemo_CSYE_6225/target/${var.ARTIFACT_NAME}.jar"
+    destination = "/tmp/app.jar"
+  }
+
   provisioner "shell" {
     script = "scripts/appDirSetup.sh"
   }
 
-  provisioner "file" {
-    source      = "../CloudDemo_CSYE_6225/target/${var.ARTIFACT_NAME}.jar"
-    destination = "/opt/myapp/app.jar"
-  }
+  # provisioner "file" {
+  #   sources      = ["/tmp/app.jar"]
+  #   destination = "/opt/myapp/app.jar"
+  # }
 
   provisioner "file" {
     sources     = ["./scripts/app.service"]
