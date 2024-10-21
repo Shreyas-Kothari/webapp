@@ -14,7 +14,7 @@ source "amazon-ebs" "shreyas-ubuntu" {
   region          = "${var.aws_region}"
   source_ami      = "${var.source_ami}"
   ssh_username    = "${var.ssh_username}"
-  subnet_id       = "${var.subnet_id}"
+  subnet_id       = "${var.bad}"
 
   # Only sharing with the demo account
   ami_users = var.ami_users
