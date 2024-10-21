@@ -43,7 +43,7 @@ build {
 
 
   provisioner "shell" {
-    script = "scripts/updateOS.sh"
+    script =       "scripts/updateOS.sh"
   }
 
   provisioner "shell" {
