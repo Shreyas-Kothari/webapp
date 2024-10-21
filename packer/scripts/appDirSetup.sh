@@ -15,6 +15,5 @@ sudo chown -R csye6225:csye6225 /opt/myapp
 ## Set the permissions
 sudo chmod -R 755 /opt/myapp
 
-sudo chmod 755 /tmp/app.jar
 # move the application files to the new directory from /tmp
 sudo mv /tmp/app.jar /opt/myapp/app.jar

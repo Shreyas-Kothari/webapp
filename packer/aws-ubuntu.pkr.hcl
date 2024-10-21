@@ -59,11 +59,6 @@ build {
     script = "scripts/appDirSetup.sh"
   }
 
-  # provisioner "file" {
-  #   sources      = ["/tmp/app.jar"]
-  #   destination = "/opt/myapp/app.jar"
-  # }
-
   provisioner "file" {
     sources     = ["./scripts/app.service"]
     destination = "/tmp/"
