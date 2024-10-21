@@ -1,7 +1,3 @@
-# webapp
-
-The repositry for CSYE6225 Cloud Computing course
-
 ## Spring Boot Project
 
 This repository contains the backend project for the CSYE6225 Cloud Computing course.
