@@ -2,8 +2,7 @@
 
 set -e
 
-sudo chmod 755 /tmp/app.service
-sudo mv /tmp/app.service /etc/systemd/system/
+sudo mv /tmp/app.service /etc/systemd/system/app.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable app

@@ -1,5 +1,6 @@
 [Unit]
 Description=CSYE6225 Spring Boot App
+ConditionPathExists=/etc/environment
 After=network.target
 
 [Service]
