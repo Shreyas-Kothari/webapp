@@ -117,6 +117,12 @@
 
 <!--		For logging end-->
 
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.29.0</version> <!-- Choose the latest stable version -->
+		</dependency>
+
 	</dependencies>
 
 	<build>
