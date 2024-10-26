@@ -47,7 +47,6 @@ public class User implements UserDetails {
     private String password;
 
     @Column(nullable = false)
-//    @ReadOnlyProperty
     private LocalDateTime account_created;
 
     @Column(nullable = false)

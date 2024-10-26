@@ -1,6 +1,7 @@
 package com.shreyas.CloudDemo.controller;
 
 import com.shreyas.CloudDemo.bean.UserBean;
+import com.shreyas.CloudDemo.bean.UserProfilePicBean;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -73,6 +75,46 @@ public class UserController extends BaseController {
         userService.updateUser(emailId, user);
         return NoContentResponse();
 
+    }
+
+    @GetMapping(value = "/self/pic", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserProfilePicBean> getUserProfilePicture(HttpServletRequest request, Authentication authentication) throws BadRequestException {
+        if (request.getContentLength() > 0 || !request.getParameterMap().isEmpty())
+            throw new BadRequestException("Request Body/Param not allowed");
+
+        String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        UserProfilePicBean profilePicBean = userService.getUserProfilePicture(emailId);
+        if (profilePicBean == null)
+            return ErrorResponse(HttpStatus.NOT_FOUND, null);
+        return SuccessResponse(profilePicBean);
+    }
+
+    @PostMapping(value = "/self/pic")
+    public ResponseEntity<UserProfilePicBean> uploadUserProfilePicture(HttpServletRequest request, Authentication authentication, @RequestParam("profilePic") MultipartFile file) throws BadRequestException {
+        if (!request.getParameterMap().isEmpty())
+            throw new BadRequestException("Request param not allowed");
+
+        String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        UserProfilePicBean profilePicBean = userService.uploadUserProfilePicture(emailId, file);
+        if(profilePicBean==null)
+            return ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,null);
+        return SuccessResponse(profilePicBean);
+    }
+
+    @DeleteMapping("/self/pic")
+    public ResponseEntity<Void> deleteUser(HttpServletRequest request, Authentication authentication) throws BadRequestException {
+        if (!request.getParameterMap().isEmpty())
+            throw new BadRequestException("Request param not allowed");
+
+        String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+        boolean isDeleted = userService.deleteUserProfilePicture(emailId);
+        if (isDeleted)
+            return NoContentResponse();
+        else
+            return ErrorResponse(HttpStatus.NOT_FOUND);
     }
 
 }
