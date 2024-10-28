@@ -6,6 +6,7 @@ import com.shreyas.CloudDemo.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/v1/users", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -25,13 +27,20 @@ public class UserController extends BaseController {
     @RequestMapping(path = "", method = {RequestMethod.HEAD, RequestMethod.OPTIONS})
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public void unSupportedMethods() {
+        log.warn("Unsupported methods");
     }
 
     @RequestMapping(path = "/self", method = {RequestMethod.HEAD, RequestMethod.OPTIONS})
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public void unSupportedMethodsForSelf() {
+        log.warn("Unsupported methods");
     }
 
+    @RequestMapping(path = "/self/pic", method = {RequestMethod.HEAD, RequestMethod.OPTIONS})
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public void unSupportedMethodsForSelfPic() {
+        log.warn("Unsupported methods");
+    }
 
     @PreAuthorize("permitAll()")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -116,5 +125,7 @@ public class UserController extends BaseController {
         else
             return ErrorResponse(HttpStatus.NOT_FOUND);
     }
+
+
 
 }

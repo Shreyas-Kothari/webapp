@@ -4,6 +4,7 @@ import com.shreyas.CloudDemo.service.interfaces.HealthCheckService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/healthz", consumes = MediaType.ALL_VALUE)
+@Slf4j
 public class HealthCheckController extends BaseController {
 
     @Autowired
@@ -32,17 +34,20 @@ public class HealthCheckController extends BaseController {
     )
     public ResponseEntity<Void> checkHealth(HttpServletRequest request) throws BadRequestException {
 
-        if(request.getContentLength() >0 || !request.getParameterMap().isEmpty())
+        if(request.getContentLength() >0 || !request.getParameterMap().isEmpty()) {
+            log.error("Request Body/Param not allowed");
             throw new BadRequestException("Request Body/Param not allowed");
-
+        }
         try {
             if (healthCheckService.isDataConnectionAvailable())
                 return SuccessResponse();
             else
                 return ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (SQLException e) {
+            log.error("SQLException: {}", e.getMessage(), e);
             return ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (Exception e) {
+            log.error("Exception: {}", e.getMessage(), e);
             return ExceptionResponse(e);
         }
 
