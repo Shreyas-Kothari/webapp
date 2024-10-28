@@ -10,6 +10,7 @@ import com.shreyas.CloudDemo.service.S3StorageService;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
 import com.shreyas.CloudDemo.utility.GenericBeanMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
 
         u.setPassword(passwordEncoder.encode(u.getPassword()));
         u = userRepo.save(u);
+        log.info("User saved successfully !!");
         return GenericBeanMapper.map(u, UserBean.class, mapper);
     }
 
@@ -73,6 +76,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepo.save(existingUser);
+        log.info("User updated successfully!!");
         return GenericBeanMapper.map(existingUser, UserBean.class, mapper);
     }
 
@@ -96,6 +100,7 @@ public class UserServiceImpl implements UserService {
                 imageEntity.setFileName(fileName);
                 imageEntity.setUserId(user.getId());
                 imageRepo.save(imageEntity);
+                log.info("User profile picture uploaded successfully!!");
                 return GenericBeanMapper.map(imageEntity, UserProfilePicBean.class, mapper);
             }
         }
@@ -112,6 +117,7 @@ public class UserServiceImpl implements UserService {
             if (deleteFromS3) {
                 // If file deleted from S3 successfully, delete from database as well.
                 imageRepo.deleteById(image.getId());
+                log.info("File deleted from S3 and database successfully !!");
                 return true;
             } else
                 return false;
