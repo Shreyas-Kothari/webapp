@@ -120,8 +120,15 @@
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>s3</artifactId>
-			<version>2.29.0</version> <!-- Choose the latest stable version -->
+			<version>2.29.0</version>
 		</dependency>
+
+<!--		Mail dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+<!--		End Mail dependencies-->
 
 	</dependencies>
 
