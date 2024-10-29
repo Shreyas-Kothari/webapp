@@ -9,7 +9,7 @@ packer {
 
 source "amazon-ebs" "shreyas-ubuntu" {
   ami_name        = "Shreyas Ubuntu ${formatdate("YYYY_MM_DD-HH_mm", timestamp())}"
-  ami_description = "AMI for CSYE 6225 A04 created at ${formatdate("YYYY/MM/DD HH:mm", timestamp())} by Packer"
+  ami_description = "AMI for CSYE 6225 A06 created at ${formatdate("YYYY/MM/DD HH:mm", timestamp())} by Packer"
   instance_type   = "${var.instance_type}"
   region          = "${var.aws_region}"
   source_ami      = "${var.source_ami}"
@@ -25,7 +25,7 @@ source "amazon-ebs" "shreyas-ubuntu" {
   }
 
   tags = {
-    Name = "Shreyas Ubuntu A04-${var.environment} ${formatdate("YYYY/MM/DD HH:mm", timestamp())}"
+    Name = "Shreyas Ubuntu A06-${var.environment} ${formatdate("YYYY/MM/DD HH:mm", timestamp())}"
   }
 
   launch_block_device_mappings {
