@@ -1,5 +1,6 @@
 package com.shreyas.CloudDemo.controller;
 
+import com.shreyas.CloudDemo.annotation.Observability;
 import com.shreyas.CloudDemo.service.interfaces.HealthCheckService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public class HealthCheckController extends BaseController {
     public void unSupportedMethods() {
     }
 
+    @Observability
     @GetMapping
     @Operation(summary = "Get the health check status",
             description = "The GET application gives the health check status for the database and other APIs services"
