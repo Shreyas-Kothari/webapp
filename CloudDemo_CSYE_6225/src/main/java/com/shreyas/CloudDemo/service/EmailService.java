@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
-@Service
+//@Service
 @Slf4j
 public class EmailService {
 
