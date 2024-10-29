@@ -17,3 +17,9 @@ sudo chmod -R 755 /opt/myapp
 
 # move the application files to the new directory from /tmp
 sudo mv /tmp/app.jar /opt/myapp/app.jar
+
+# Create the necessary directories for CloudWatch Agent
+sudo mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
+
+# Move the CloudWatch configuration file to the appropriate directory
+sudo mv /tmp/cloudwatch-config.json /opt/aws/amazon-cloudwatch-agent/etc/cloudwatch-config.json

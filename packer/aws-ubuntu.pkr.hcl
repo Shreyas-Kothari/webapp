@@ -55,6 +55,11 @@ build {
     destination = "/tmp/app.jar"
   }
 
+    provisioner "file" {
+    sources     = ["./cloudwatch-config.json"]
+    destination = "/tmp/"
+  }
+
   provisioner "shell" {
     script = "scripts/appDirSetup.sh"
   }
@@ -62,6 +67,10 @@ build {
   provisioner "file" {
     sources     = ["./scripts/app.service"]
     destination = "/tmp/"
+  }
+
+  provisioner "shell" {
+    script = "scripts/cloudWatch.sh"
   }
 
   provisioner "shell" {
