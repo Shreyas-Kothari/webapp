@@ -55,7 +55,7 @@ build {
     destination = "/tmp/app.jar"
   }
 
-    provisioner "file" {
+  provisioner "file" {
     sources     = ["./cloudwatch-config.json"]
     destination = "/tmp/"
   }
