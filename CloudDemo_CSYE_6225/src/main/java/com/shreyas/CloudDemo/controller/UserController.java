@@ -1,5 +1,6 @@
 package com.shreyas.CloudDemo.controller;
 
+import com.shreyas.CloudDemo.annotation.Observability;
 import com.shreyas.CloudDemo.bean.UserBean;
 import com.shreyas.CloudDemo.bean.UserProfilePicBean;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
@@ -42,6 +43,7 @@ public class UserController extends BaseController {
         log.warn("Unsupported methods");
     }
 
+    @Observability
     @PreAuthorize("permitAll()")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserBean> createUser(HttpServletRequest request, @RequestBody @Valid UserBean user) throws BadRequestException {
@@ -55,6 +57,7 @@ public class UserController extends BaseController {
         return CreatedResponse(user);
     }
 
+    @Observability
     @GetMapping("/self")
     public ResponseEntity<UserBean> getUserDetails(HttpServletRequest request, Authentication authentication) throws BadRequestException {
         if (request.getContentLength() > 0 || !request.getParameterMap().isEmpty())
@@ -68,6 +71,7 @@ public class UserController extends BaseController {
         return NoContentResponse();
     }
 
+    @Observability
     @PutMapping(value = "/self", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserBean> updateUser(HttpServletRequest request, Authentication authentication, @RequestBody @Valid UserBean user) throws BadRequestException {
         if (!request.getParameterMap().isEmpty())
@@ -86,6 +90,7 @@ public class UserController extends BaseController {
 
     }
 
+    @Observability
     @GetMapping(value = "/self/pic", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserProfilePicBean> getUserProfilePicture(HttpServletRequest request, Authentication authentication) throws BadRequestException {
         if (request.getContentLength() > 0 || !request.getParameterMap().isEmpty())
@@ -99,6 +104,7 @@ public class UserController extends BaseController {
         return SuccessResponse(profilePicBean);
     }
 
+    @Observability
     @PostMapping(value = "/self/pic")
     public ResponseEntity<UserProfilePicBean> uploadUserProfilePicture(HttpServletRequest request, Authentication authentication, @RequestParam("profilePic") MultipartFile file) throws BadRequestException {
         if (!request.getParameterMap().isEmpty())
@@ -112,6 +118,7 @@ public class UserController extends BaseController {
         return SuccessResponse(profilePicBean);
     }
 
+    @Observability
     @DeleteMapping("/self/pic")
     public ResponseEntity<Void> deleteUser(HttpServletRequest request, Authentication authentication) throws BadRequestException {
         if (!request.getParameterMap().isEmpty())
