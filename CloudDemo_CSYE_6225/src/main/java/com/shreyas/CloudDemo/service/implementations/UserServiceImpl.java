@@ -88,20 +88,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfilePicBean uploadUserProfilePicture(String emailId, MultipartFile file) {
+    public UserProfilePicBean uploadUserProfilePicture(String emailId, MultipartFile file) throws BadRequestException {
         if (file != null) {
             User user = userRepo.findByEmail(emailId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            String path = user.getId().toString();
-            String fileName = file.getOriginalFilename();
-            String fileUrl = s3Service.saveFile(path, fileName, file);
-            if (!fileUrl.isBlank()) {
-                Image imageEntity = new Image();
-                imageEntity.setUrl(fileUrl);
-                imageEntity.setFileName(fileName);
-                imageEntity.setUserId(user.getId());
-                imageRepo.save(imageEntity);
-                log.info("User profile picture uploaded successfully!!");
-                return GenericBeanMapper.map(imageEntity, UserProfilePicBean.class, mapper);
+            if (imageRepo.findByUserId(user.getId()).isEmpty()) {
+                String path = user.getId().toString();
+                String fileName = file.getOriginalFilename();
+                String fileUrl = s3Service.saveFile(path, fileName, file);
+                if (!fileUrl.isBlank()) {
+                    Image imageEntity = new Image();
+                    imageEntity.setUrl(fileUrl);
+                    imageEntity.setFileName(fileName);
+                    imageEntity.setUserId(user.getId());
+                    imageRepo.save(imageEntity);
+                    log.info("User profile picture uploaded successfully!!");
+                    return GenericBeanMapper.map(imageEntity, UserProfilePicBean.class, mapper);
+                }
+            } else {
+                throw new BadRequestException("User profile picture already exists");
             }
         }
         return null;
