@@ -24,18 +24,14 @@ public class ObservabilityAspect {
     private final MeterRegistry meterRegistry;
 
     @Around("@annotation(com.shreyas.CloudDemo.annotation.Observability) || @within(com.shreyas.CloudDemo.annotation.Observability)")
-    public Object observeAPITimerCount(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object observeAPICount(ProceedingJoinPoint joinPoint) throws Throwable {
         String apiPth = getAPIPath(joinPoint);
         try {
             // Execute the annotated method
             return joinPoint.proceed();
-        } catch (Exception e) {
-            meterRegistry.counter("api.call.errors" + apiPth, "application","csye6225","api", apiPth).increment();
-            log.error("API call failed for {}", apiPth, e);
-            throw e;
         } finally {
             // Increment counter for API call count
-            meterRegistry.counter("api.call.count" + apiPth, "api", apiPth).increment();
+            meterRegistry.counter("api.call.count" + apiPth, "api", apiPth, "application","csye6225").increment();
             log.info("Counter metrics recorded for {}", apiPth);
         }
     }
@@ -64,13 +60,13 @@ public class ObservabilityAspect {
     public Object observeDatabaseCall(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         Timer.Sample sample = Timer.start(meterRegistry);
-
         try {
             return joinPoint.proceed();
         } finally {
+            String repoName = joinPoint.getSignature().getDeclaringTypeName();
             Timer timer = Timer.builder("database.query.duration." + methodName)
                     .description("Time taken for database queries in ms")
-                    .tags("application","csye6225","repository", joinPoint.getSignature().getDeclaringTypeName(), "method", methodName)
+                    .tags("application","csye6225","repository", repoName)
                     .register(meterRegistry);
             sample.stop(timer);
             log.info("Database query duration recorded for {}", methodName);
@@ -79,16 +75,16 @@ public class ObservabilityAspect {
 
     @Around("within(@org.springframework.stereotype.Service *)")
     public Object observeServiceCall(ProceedingJoinPoint joinPoint) throws Throwable {
-        String methodName = joinPoint.getSignature().toShortString();
+        String methodName = joinPoint.getSignature().getName();
         Timer.Sample sample = Timer.start(meterRegistry);
 
         try {
             return joinPoint.proceed();
         } finally {
             String serviceName = joinPoint.getSignature().getDeclaringTypeName();
-            Timer timer = Timer.builder(serviceName.contains("S3") ? "aws.s3.call.duration" : "service.call.duration")
+            Timer timer = Timer.builder(serviceName.contains("S3") ? "s3.call.duration."+ methodName : "service.call.duration")
                     .description("Time taken for service calls in ms")
-                    .tags("application","csye6225","service", serviceName, "method", methodName)
+                    .tags("application","csye6225","service", serviceName)
                     .register(meterRegistry);
             sample.stop(timer);
             log.info("Service call duration recorded for {}", methodName);
@@ -115,7 +111,7 @@ public class ObservabilityAspect {
         } else if (method.isAnnotationPresent(RequestMapping.class)) {
             methodPath = classPath + getMappingPath(method, RequestMapping.class);
         }
-        return methodPath.replace("/", ".");
+        return methodPath;       //.replace("/", ".");
     }
 
     private String getMappingPath(Method method, Class<? extends Annotation> annotationType) {

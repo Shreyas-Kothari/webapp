@@ -91,7 +91,7 @@ public class UserController extends BaseController {
     }
 
     @Observability
-    @GetMapping(value = "/self/pic", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/self/pic")
     public ResponseEntity<UserProfilePicBean> getUserProfilePicture(HttpServletRequest request, Authentication authentication) throws BadRequestException {
         if (request.getContentLength() > 0 || !request.getParameterMap().isEmpty())
             throw new BadRequestException("Request Body/Param not allowed");
@@ -114,7 +114,7 @@ public class UserController extends BaseController {
 
         UserProfilePicBean profilePicBean = userService.uploadUserProfilePicture(emailId, file);
         if(profilePicBean==null)
-            return ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,null);
+            return ErrorResponse(HttpStatus.NOT_FOUND,null);
         return SuccessResponse(profilePicBean);
     }
 
