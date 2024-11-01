@@ -113,8 +113,8 @@ public class UserController extends BaseController {
         String emailId = ((UserDetails) authentication.getPrincipal()).getUsername();
 
         UserProfilePicBean profilePicBean = userService.uploadUserProfilePicture(emailId, file);
-        if(profilePicBean==null)
-            return ErrorResponse(HttpStatus.NOT_FOUND,null);
+        if (profilePicBean == null)
+            return ErrorResponse(HttpStatus.NOT_FOUND, null);
         return SuccessResponse(profilePicBean);
     }
 
@@ -132,7 +132,6 @@ public class UserController extends BaseController {
         else
             return ErrorResponse(HttpStatus.NOT_FOUND);
     }
-
 
 
 }
