@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "Unsupported Multipart");
         errorResponse.put("message", ex.getMessage());
         log.error("MultipartException: {}", errorResponse);
-        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     // Handle resource not found exceptions
