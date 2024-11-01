@@ -15,6 +15,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.sql.SQLException;
@@ -92,6 +93,15 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "Unsupported Media Type");
         errorResponse.put("message", ex.getMessage());
         log.error("HttpMediaTypeNotSupportedException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<Map<String, String>> handleMultipartException(MultipartException ex){
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Unsupported Multipart");
+        errorResponse.put("message", ex.getMessage());
+        log.error("MultipartException: {}", errorResponse);
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
     }
 

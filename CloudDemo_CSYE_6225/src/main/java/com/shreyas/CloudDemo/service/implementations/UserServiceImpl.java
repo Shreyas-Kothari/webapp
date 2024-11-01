@@ -17,8 +17,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -90,10 +93,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfilePicBean uploadUserProfilePicture(String emailId, MultipartFile file) throws BadRequestException {
         if (file != null) {
+            List<String> acceptedExtensions = Arrays.asList(".jpg", ".png", ".jpeg");
+
+            String fileName = file.getOriginalFilename();
+            String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+
+            if (!acceptedExtensions.contains(fileExtension.toLowerCase())) {
+                throw new MultipartException("Invalid file extension. Only " + acceptedExtensions + " are accepted.");
+            }
+
             User user = userRepo.findByEmail(emailId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
             if (imageRepo.findByUserId(user.getId()).isEmpty()) {
                 String path = user.getId().toString();
-                String fileName = file.getOriginalFilename();
                 String fileUrl = s3Service.saveFile(path, fileName, file);
                 if (!fileUrl.isBlank()) {
                     Image imageEntity = new Image();
