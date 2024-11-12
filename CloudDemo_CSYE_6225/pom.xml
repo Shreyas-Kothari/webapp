@@ -123,13 +123,6 @@
 			<version>2.29.0</version>
 		</dependency>
 
-<!--		Mail dependencies -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-<!--		End Mail dependencies-->
-
 <!--		Monitoring and observability -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
