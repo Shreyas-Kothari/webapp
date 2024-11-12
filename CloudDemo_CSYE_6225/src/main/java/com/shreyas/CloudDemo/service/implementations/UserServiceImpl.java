@@ -1,5 +1,7 @@
 package com.shreyas.CloudDemo.service.implementations;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.shreyas.CloudDemo.bean.EmailRequest;
 import com.shreyas.CloudDemo.bean.UserBean;
 import com.shreyas.CloudDemo.bean.UserProfilePicBean;
 import com.shreyas.CloudDemo.entity.Image;
@@ -7,6 +9,7 @@ import com.shreyas.CloudDemo.entity.User;
 import com.shreyas.CloudDemo.repository.ImageRepo;
 import com.shreyas.CloudDemo.repository.UserRepo;
 import com.shreyas.CloudDemo.service.S3StorageService;
+import com.shreyas.CloudDemo.service.SNSMailService;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
 import com.shreyas.CloudDemo.utility.GenericBeanMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper mapper;
     private final ImageRepo imageRepo;
     private final S3StorageService s3Service;
+    private final SNSMailService snsService;
 
     @Transactional
     public UserBean createUser(UserBean user) throws BadRequestException {
@@ -50,6 +54,9 @@ public class UserServiceImpl implements UserService {
         u.setPassword(passwordEncoder.encode(u.getPassword()));
         u = userRepo.save(u);
         log.info("User saved successfully !!");
+
+        sendVerificationMail(u.getEmail(), "Verification mail for " + u.getId().toString());
+
         return GenericBeanMapper.map(u, UserBean.class, mapper);
     }
 
@@ -140,5 +147,17 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-
+    private void sendVerificationMail(String emailId, String message) {
+        EmailRequest request = new EmailRequest(emailId, "Verify the email address", message);
+        try {
+            boolean response = snsService.publishMailRequestToTopic(request);
+            if (response) {
+                log.info("EmailID verification mail published successfully!!");
+            } else {
+                log.error("Failed to publish emailID verification mail.");
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
