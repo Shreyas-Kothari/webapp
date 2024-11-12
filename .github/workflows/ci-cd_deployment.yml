@@ -49,6 +49,7 @@ jobs:
           MAIL_SERVICE_USERNAME: ${{ secrets.MAIL_SERVICE_USERNAME }}
           MAIL_SERVICE_HOST: ${{ vars.MAIL_SERVICE_HOST }}
           MAIL_SERVICE_PORT: ${{ vars.MAIL_SERVICE_PORT }}
+          SNS_MAIL_TOPIC_ARN: test
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
