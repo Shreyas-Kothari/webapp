@@ -44,11 +44,6 @@ jobs:
           AWS_REGION: ${{ vars.AWS_REGION }}
           LOG_FILE_NAME: ${{ vars.LOG_FILE_NAME }}
           S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
-          MAIL_SERVICE_ENABLED: ${{ vars.MAIL_SERVICE_ENABLED }}
-          MAIL_SERVICE_PASSWORD: ${{ secrets.MAIL_SERVICE_PASSWORD }}
-          MAIL_SERVICE_USERNAME: ${{ secrets.MAIL_SERVICE_USERNAME }}
-          MAIL_SERVICE_HOST: ${{ vars.MAIL_SERVICE_HOST }}
-          MAIL_SERVICE_PORT: ${{ vars.MAIL_SERVICE_PORT }}
           SNS_MAIL_TOPIC_ARN: test
 
       - name: Configure AWS credentials
