@@ -46,6 +46,7 @@ jobs:
           S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
           SNS_MAIL_TOPIC_ARN: test
           APPLICATION_BASE_URL: ${{ vars.APPLICATION_BASE_URL }}
+          EMAIL_EXPIRY_MIN: ${{ vars.EMAIL_EXPIRY_MIN }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
