@@ -133,5 +133,12 @@ public class UserController extends BaseController {
             return ErrorResponse(HttpStatus.NOT_FOUND);
     }
 
-
+    @Observability
+    @PreAuthorize("permitAll()")
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyUser(@RequestParam("user") String email,
+                                           @RequestParam("token") String token) {
+        String response = userService.verifyUser(email, token);
+        return SuccessResponse(response);
+    }
 }

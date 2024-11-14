@@ -52,6 +52,8 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDateTime account_updated;
 
+    private boolean IsEnabled = false;
+
     @PrePersist
     protected void onCreate() {
         this.account_created = LocalDateTime.now();
@@ -109,6 +111,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.IsEnabled;
     }
 }
