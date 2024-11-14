@@ -80,4 +80,63 @@ jobs:
           -var 'subnet_id=${{ vars.SUBNET_ID }}' \
           -var 'environment=${{ vars.ENVIRONMENT_NAME }}' \
           -var 'ARTIFACT_NAME=${{ vars.JAR_NAME }}' .
-    
+  
+  extract_ami_id:
+    name: Extract AMI ID
+    runs-on: ubuntu-latest
+    needs: build_ami
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract AMI ID from manifest.json
+        run: |
+          AMI_ID=$(jq -r '.builds[-1].artifact_id' ./packer/manifest.json | cut -d ":" -f2)
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+
+  get_launch_template_id:
+    name: Get Launch Template ID
+    runs-on: ubuntu-latest
+    needs: extract_ami_id
+    steps:
+      - name: Get Launch Template ID
+        run: |
+          LT_ID=$(aws ec2 describe-launch-templates --launch-template-name ${{ vars.Launch_Template }} | jq '.LaunchTemplates[].LaunchTemplateId')
+          LT_ID="${LT_ID%\"}"
+          LT_ID="${LT_ID#\"}"
+          echo "LT_ID=$LT_ID" >> $GITHUB_ENV
+
+  update_asg:
+    name: Update ASG with New AMI
+    runs-on: ubuntu-latest
+    needs: get_launch_template_id
+    steps:
+      - name: Create a new version of the Launch Template
+        run: |
+          aws ec2 create-launch-template-version \
+          --launch-template-id $LT_ID \
+          --version-description "New version with updated AMI" \
+          --source-version 1 \
+          --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
+
+      - name: Update ASG to use the new Launch Template version
+        run: |
+          aws autoscaling update-auto-scaling-group \
+          --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+          --launch-template "LaunchTemplateId=$LT_ID,Version=\$Latest" \
+          --strategy Rolling
+
+      - name: Start an instance refresh
+        run: |
+          aws autoscaling start-instance-refresh \
+          --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+          --preferences "{\"MinHealthyPercentage\":75}
+
+      - name: Wait for Instance Refresh to Complete
+        run: |
+          aws autoscaling describe-instance-refreshes \
+          --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+          --instance-refresh-ids $(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names ${{ vars.ASG_NAME }} | jq -r '.AutoScalingGroups[].LatestInstanceRefreshId') \
+          --query 'InstanceRefreshes[].Status' \
+          --output text
+      
