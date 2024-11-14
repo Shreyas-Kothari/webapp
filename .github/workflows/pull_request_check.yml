@@ -43,6 +43,7 @@ jobs:
           LOG_FILE_NAME: ${{ vars.LOG_FILE_NAME }}
           S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
           SNS_MAIL_TOPIC_ARN: test
+          APPLICATION_BASE_URL: ${{ vars.APPLICATION_BASE_URL }}
 
       - name: Set up Packer
         uses: hashicorp/setup-packer@v3

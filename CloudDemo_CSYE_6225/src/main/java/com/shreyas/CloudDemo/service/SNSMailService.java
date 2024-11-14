@@ -31,7 +31,7 @@ public class SNSMailService {
                 .build();
 
         PublishResponse response = snsClient.publish(publishRequest);
-        log.info("MessageID for publishing to SNS topic is {} with status code {}", response.messageId(), response.sdkHttpResponse());
+        log.info("MessageID for publishing to SNS topic is {} with status code {}", response.messageId(), response.sdkHttpResponse().statusText().toString());
         return response.sdkHttpResponse().isSuccessful();
     }
 }

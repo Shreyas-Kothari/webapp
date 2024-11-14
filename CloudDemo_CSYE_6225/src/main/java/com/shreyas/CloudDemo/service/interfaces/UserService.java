@@ -19,4 +19,6 @@ public interface UserService {
     UserProfilePicBean uploadUserProfilePicture(String emailId, MultipartFile file) throws BadRequestException;
 
     boolean deleteUserProfilePicture(String emailId);
+
+    String verifyUser(String user, String token);
 }
