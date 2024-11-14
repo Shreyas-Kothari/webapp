@@ -135,7 +135,7 @@ public class UserController extends BaseController {
 
     @Observability
     @PreAuthorize("permitAll()")
-    @GetMapping("/verify")
+    @GetMapping(value= "/verify", produces = "text/html")
     public ResponseEntity<String> verifyUser(@RequestParam("user") String email,
                                            @RequestParam("token") String token) {
         String response = userService.verifyUser(email, token);
