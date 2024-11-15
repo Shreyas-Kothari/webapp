@@ -76,4 +76,8 @@ build {
   provisioner "shell" {
     script = "scripts/appSetup.sh"
   }
+
+  post-processor "manifest" {
+    output = "manifest.json"
+  }
 }

@@ -145,7 +145,6 @@ jobs:
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name ${{ vars.ASG_NAME }} \
             --launch-template "LaunchTemplateId=$LT_ID,Version=${{ needs.create_launch_template_version.outputs.launch_template_version }}"
-            --strategy Rolling
 
   start_instance_refresh:
     name: Start Instance Refresh
@@ -156,7 +155,7 @@ jobs:
         run: |
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-            --preferences "{\"MinHealthyPercentage\":75}"
+            --strategy Rolling"
 
   wait_for_refresh_completion:
     name: Wait for Instance Refresh to Complete
