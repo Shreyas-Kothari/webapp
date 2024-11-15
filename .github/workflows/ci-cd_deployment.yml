@@ -20,7 +20,10 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
+    
+    outputs:
+      ami_id_output: ${{ steps.build_ami.outputs.PACKER_BUILD_IMAGE_ID }}
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -80,24 +83,31 @@ jobs:
           -var 'subnet_id=${{ vars.SUBNET_ID }}' \
           -var 'environment=${{ vars.ENVIRONMENT_NAME }}' \
           -var 'ARTIFACT_NAME=${{ vars.JAR_NAME }}' .
-  
-  extract_ami_id:
-    name: Extract AMI ID
-    runs-on: ubuntu-latest
-    needs: build_ami
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+
+      - name: Check the menifest.json
+        run: | 
+          ls -l ./packer/manifest.json || echo "Manifest file not found in ./packer/manifest.json!"
+          ls -l ./manifest.json || echo "Manifest file not found in ./manifest.json!"
 
       - name: Extract AMI ID from manifest.json
+        working-directory: ./packer
         run: |
-          AMI_ID=$(jq -r '.builds[-1].artifact_id' ./packer/manifest.json | cut -d ":" -f2)
+          AMI_ID=$(jq -r '.builds[-1].artifact_id' manifest.json | cut -d ":" -f2)
+          echo "AMI_ID=$AMI_ID"
           echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+
+  access_ami_id:
+    name: Access the AMI ID from last job
+    needs: build_ami
+    runs-on: ubuntu-latest
+    steps:
+      - name: Access the AMI ID from last job
+        run: echo "AMI_ID=${{ needs.build_ami.outputs.ami_id_output }}"
 
   get_launch_template_id:
     name: Get Launch Template ID
     runs-on: ubuntu-latest
-    needs: extract_ami_id
+    needs: build_ami
     steps:
       - name: Get Launch Template ID
         run: |
@@ -106,37 +116,95 @@ jobs:
           LT_ID="${LT_ID#\"}"
           echo "LT_ID=$LT_ID" >> $GITHUB_ENV
 
-  update_asg:
-    name: Update ASG with New AMI
+  create_launch_template_version:
+    name: Create New Launch Template Version
     runs-on: ubuntu-latest
     needs: get_launch_template_id
+    outputs:
+      launch_template_version: ${{ steps.create_version.outputs.template_version }}
     steps:
       - name: Create a new version of the Launch Template
+        id: create_version
         run: |
-          aws ec2 create-launch-template-version \
-          --launch-template-id $LT_ID \
-          --version-description "New version with updated AMI" \
-          --source-version 1 \
-          --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
+          TEMPLATE_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-id $LT_ID \
+            --version-description "New version with updated AMI" \
+            --source-version 1 \
+            --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
+            | jq -r '.LaunchTemplateVersion.VersionNumber')
+          echo "TEMPLATE_VERSION=$TEMPLATE_VERSION" >> $GITHUB_ENV
+          echo "::set-output name=template_version::$TEMPLATE_VERSION"
 
+  update_asg_with_new_version:
+    name: Update ASG with New Launch Template Version
+    runs-on: ubuntu-latest
+    needs: create_launch_template_version
+    steps:
       - name: Update ASG to use the new Launch Template version
         run: |
           aws autoscaling update-auto-scaling-group \
-          --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-          --launch-template "LaunchTemplateId=$LT_ID,Version=\$Latest" \
-          --strategy Rolling
+            --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+            --launch-template "LaunchTemplateId=$LT_ID,Version=${{ needs.create_launch_template_version.outputs.launch_template_version }}"
+            --strategy Rolling
 
+  start_instance_refresh:
+    name: Start Instance Refresh
+    runs-on: ubuntu-latest
+    needs: update_asg_with_new_version
+    steps:
       - name: Start an instance refresh
         run: |
           aws autoscaling start-instance-refresh \
-          --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-          --preferences "{\"MinHealthyPercentage\":75}
+            --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+            --preferences "{\"MinHealthyPercentage\":75}"
 
+  wait_for_refresh_completion:
+    name: Wait for Instance Refresh to Complete
+    runs-on: ubuntu-latest
+    needs: start_instance_refresh
+    steps:
       - name: Wait for Instance Refresh to Complete
         run: |
+          REFRESH_ID=$(aws autoscaling describe-auto-scaling-groups \
+            --auto-scaling-group-names ${{ vars.ASG_NAME }} \
+            | jq -r '.AutoScalingGroups[].LatestInstanceRefreshId')
           aws autoscaling describe-instance-refreshes \
-          --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-          --instance-refresh-ids $(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names ${{ vars.ASG_NAME }} | jq -r '.AutoScalingGroups[].LatestInstanceRefreshId') \
-          --query 'InstanceRefreshes[].Status' \
-          --output text
+            --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+            --instance-refresh-ids $REFRESH_ID \
+            --query 'InstanceRefreshes[].Status' \
+            --output text
+
+  # update_asg:
+  #   name: Update ASG with New AMI
+  #   runs-on: ubuntu-latest
+  #   needs: get_launch_template_id
+  #   steps:
+  #     - name: Create a new version of the Launch Template
+  #       run: |
+  #         aws ec2 create-launch-template-version \
+  #         --launch-template-id $LT_ID \
+  #         --version-description "New version with updated AMI" \
+  #         --source-version 1 \
+  #         --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
+
+  #     - name: Update ASG to use the new Launch Template version
+  #       run: |
+  #         aws autoscaling update-auto-scaling-group \
+  #         --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+  #         --launch-template "LaunchTemplateId=$LT_ID,Version=\$Latest" \
+  #         --strategy Rolling
+
+  #     - name: Start an instance refresh
+  #       run: |
+  #         aws autoscaling start-instance-refresh \
+  #         --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+  #         --preferences "{\"MinHealthyPercentage\":75}
+
+  #     - name: Wait for Instance Refresh to Complete
+  #       run: |
+  #         aws autoscaling describe-instance-refreshes \
+  #         --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+  #         --instance-refresh-ids $(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names ${{ vars.ASG_NAME }} | jq -r '.AutoScalingGroups[].LatestInstanceRefreshId') \
+  #         --query 'InstanceRefreshes[].Status' \
+  #         --output text
       
