@@ -109,8 +109,9 @@ jobs:
       - name: Get Launch Template ID
         id: get_lt_id
         run: |
-          echo "Launch Template Name: ${{ vars.Launch_Template }}"
-          LT_ID=$(aws ec2 describe-launch-templates --launch-template-name ${{ vars.Launch_Template }} | jq '.LaunchTemplates[].LaunchTemplateId')
+          LT_ID=$(aws ec2 describe-launch-templates \
+          --launch-template-name ${{ vars.Launch_Template }} \
+          | jq '.LaunchTemplates[].LaunchTemplateId')
           echo "Initial LT_ID=$LT_ID"
           LT_ID="${LT_ID%\"}"
           LT_ID="${LT_ID#\"}"
