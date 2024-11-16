@@ -22,7 +22,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     
     outputs:
-      ami_id_output: ${{ steps.extract_ami_id.outputs.PACKER_BUILD_IMAGE_ID }}
+      PACKER_IMAGE_ID: ${{ steps.extract_ami_id.outputs.PACKER_BUILD_IMAGE_ID }}
     
     steps:
       - name: Checkout code
@@ -35,7 +35,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Reading secrets and env vars
-        run: echo "DB_URL=${{ secrets.DB_URL }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}, JAR_NAME=${{ env.JAR_NAME }}"
+        run: echo "DB_URL=${{ secrets.DB_URL }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
 
       - name: Run with Maven
         working-directory: ./CloudDemo_CSYE_6225
@@ -87,8 +87,7 @@ jobs:
         run: |
           AMI_ID=$(jq -r '.builds[-1].artifact_id' manifest.json | cut -d ":" -f2)
           echo "AMI_ID=$AMI_ID"
-          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
-          echo "::set-output name=PACKER_BUILD_IMAGE_ID::$AMI_ID"
+          echo "PACKER_BUILD_IMAGE_ID=$AMI_ID" >> $GITHUB_OUTPUT
 
   access_ami_id:
     name: Access the AMI ID from last job
@@ -96,42 +95,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Access the AMI ID from last job
-        run: echo "AMI_ID=${{ needs.build_ami.outputs.ami_id_output }}"
+        run: |
+          echo "AMI_ID=${{ needs.build_ami.outputs.PACKER_IMAGE_ID }}"
 
   get_launch_template_id:
     name: Get Launch Template ID
+    environment: dev
     runs-on: ubuntu-latest
+    outputs:
+      Launch_Template_ID: ${{ steps.get_lt_id.outputs.LT_ID }}
     needs: build_ami
     steps:
       - name: Get Launch Template ID
+        id: get_lt_id
         run: |
           echo "Launch Template Name: ${{ vars.Launch_Template }}"
           LT_ID=$(aws ec2 describe-launch-templates --launch-template-name ${{ vars.Launch_Template }} | jq '.LaunchTemplates[].LaunchTemplateId')
+          echo "Initial LT_ID=$LT_ID"
           LT_ID="${LT_ID%\"}"
           LT_ID="${LT_ID#\"}"
-          echo "LT_ID=$LT_ID" >> $GITHUB_ENV
+          echo "After processing LT_ID=$LT_ID"
+          echo "LT_ID=$LT_ID" >> $GITHUB_OUTPUT
 
   create_launch_template_version:
     name: Create New Launch Template Version
     runs-on: ubuntu-latest
-    needs: get_launch_template_id
+    needs: [get_launch_template_id,build_ami]
     outputs:
-      launch_template_version: ${{ steps.create_version.outputs.template_version }}
+      launch_template_version: ${{ steps.create_version.outputs.TEMPLATE_VERSION }}
     steps:
       - name: Create a new version of the Launch Template
         id: create_version
         run: |
           TEMPLATE_VERSION=$(aws ec2 create-launch-template-version \
-            --launch-template-id $LT_ID \
+            --launch-template-id ${{ needs.get_launch_template_id.outputs.Launch_Template_ID }} \
             --version-description "New version with updated AMI" \
             --source-version 1 \
-            --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
+            --launch-template-data "{\"ImageId\":\"${{ needs.build_ami.outputs.PACKER_IMAGE_ID }}\"}" \
             | jq -r '.LaunchTemplateVersion.VersionNumber')
-          echo "TEMPLATE_VERSION=$TEMPLATE_VERSION" >> $GITHUB_ENV
-          echo "::set-output name=template_version::$TEMPLATE_VERSION"
+          echo "TEMPLATE_VERSION=$TEMPLATE_VERSION" >> $GITHUB_OUTPUT
 
   update_asg_with_new_version:
     name: Update ASG with New Launch Template Version
+    environment: dev
     runs-on: ubuntu-latest
     needs: create_launch_template_version
     steps:
@@ -143,6 +149,7 @@ jobs:
 
   start_instance_refresh:
     name: Start Instance Refresh
+    environment: dev
     runs-on: ubuntu-latest
     needs: update_asg_with_new_version
     steps:
@@ -154,6 +161,7 @@ jobs:
 
   wait_for_refresh_completion:
     name: Wait for Instance Refresh to Complete
+    environment: dev
     runs-on: ubuntu-latest
     needs: start_instance_refresh
     steps:
