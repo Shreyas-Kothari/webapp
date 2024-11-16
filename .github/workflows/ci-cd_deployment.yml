@@ -121,6 +121,7 @@ jobs:
     name: Create New Launch Template Version
     runs-on: ubuntu-latest
     needs: [get_launch_template_id,build_ami]
+    if: ${{ needs.get_launch_template_id.outputs.Launch_Template_ID != '' }}
     outputs:
       launch_template_version: ${{ steps.create_version.outputs.TEMPLATE_VERSION }}
     steps:
@@ -140,6 +141,7 @@ jobs:
     environment: dev
     runs-on: ubuntu-latest
     needs: create_launch_template_version
+    if: ${{ needs.create_launch_template_version.outputs.launch_template_version != '' }}
     steps:
       - name: Update ASG to use the new Launch Template version
         run: |
