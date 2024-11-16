@@ -178,6 +178,8 @@ jobs:
     environment: dev
     runs-on: ubuntu-latest
     needs: update_asg_with_new_version
+    outputs:
+      InstanceRefreshId: ${{ steps.start_refresh.outputs.InstanceRefreshId }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -187,10 +189,14 @@ jobs:
           aws-region: "us-east-1"
 
       - name: Start an instance refresh
+        id: start_refresh
         run: |
-          aws autoscaling start-instance-refresh \
+          InstanceRefreshId=$(aws autoscaling start-instance-refresh \
             --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-            --strategy Rolling"
+            --strategy Rolling
+            | jq -r '.InstanceRefreshId')
+          echo "InstanceRefreshId=$InstanceRefreshId"
+          echo "InstanceRefreshId=$InstanceRefreshId" >> $GITHUB_OUTPUT
 
   wait_for_refresh_completion:
     name: Wait for Instance Refresh to Complete
@@ -207,12 +213,9 @@ jobs:
           
       - name: Wait for Instance Refresh to Complete
         run: |
-          REFRESH_ID=$(aws autoscaling describe-auto-scaling-groups \
-            --auto-scaling-group-names ${{ vars.ASG_NAME }} \
-            | jq -r '.AutoScalingGroups[].LatestInstanceRefreshId')
           aws autoscaling describe-instance-refreshes \
             --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-            --instance-refresh-ids $REFRESH_ID \
+            --instance-refresh-ids ${{needs.start_instance_refresh.outputs.InstanceRefreshId}} \
             --query 'InstanceRefreshes[].Status' \
             --output text
 
