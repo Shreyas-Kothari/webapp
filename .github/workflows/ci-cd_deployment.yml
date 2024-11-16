@@ -157,7 +157,7 @@ jobs:
     name: Update ASG with New Launch Template Version
     environment: dev
     runs-on: ubuntu-latest
-    needs: create_launch_template_version
+    needs: [get_launch_template_id,create_launch_template_version]
     if: ${{ needs.create_launch_template_version.outputs.launch_template_version != '' }}
     steps:
       - name: Configure AWS credentials
@@ -171,7 +171,7 @@ jobs:
         run: |
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-            --launch-template "LaunchTemplateId=$LT_ID,Version=${{ needs.create_launch_template_version.outputs.launch_template_version }}"
+            --launch-template "LaunchTemplateId=${{needs.get_launch_template_id.outputs.Launch_Template_ID}},Version=${{ needs.create_launch_template_version.outputs.launch_template_version }}"
 
   start_instance_refresh:
     name: Start Instance Refresh
