@@ -22,7 +22,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     
     outputs:
-      ami_id_output: ${{ steps.build_ami.outputs.PACKER_BUILD_IMAGE_ID }}
+      ami_id_output: ${{ steps.extract_ami_id.outputs.PACKER_BUILD_IMAGE_ID }}
     
     steps:
       - name: Checkout code
@@ -65,9 +65,6 @@ jobs:
         working-directory: ./packer
         run: packer init .
 
-      - name: Check the secrets
-        run: echo "DB_URL=${{ secrets.DB_URL }} DB_NAME=${{ secrets.DB_NAME }} DB_USERNAME=${{ secrets.DB_USERNAME }} DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
-
       - name: Packer Validate
         working-directory: ./packer
         run: |
@@ -84,17 +81,14 @@ jobs:
           -var 'environment=${{ vars.ENVIRONMENT_NAME }}' \
           -var 'ARTIFACT_NAME=${{ vars.JAR_NAME }}' .
 
-      - name: Check the menifest.json
-        run: | 
-          ls -l ./packer/manifest.json || echo "Manifest file not found in ./packer/manifest.json!"
-          ls -l ./manifest.json || echo "Manifest file not found in ./manifest.json!"
-
       - name: Extract AMI ID from manifest.json
+        id: extract_ami_id
         working-directory: ./packer
         run: |
           AMI_ID=$(jq -r '.builds[-1].artifact_id' manifest.json | cut -d ":" -f2)
           echo "AMI_ID=$AMI_ID"
           echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+          echo "::set-output name=PACKER_BUILD_IMAGE_ID::$AMI_ID"
 
   access_ami_id:
     name: Access the AMI ID from last job
@@ -111,6 +105,7 @@ jobs:
     steps:
       - name: Get Launch Template ID
         run: |
+          echo "Launch Template Name: ${{ vars.Launch_Template }}"
           LT_ID=$(aws ec2 describe-launch-templates --launch-template-name ${{ vars.Launch_Template }} | jq '.LaunchTemplates[].LaunchTemplateId')
           LT_ID="${LT_ID%\"}"
           LT_ID="${LT_ID#\"}"
