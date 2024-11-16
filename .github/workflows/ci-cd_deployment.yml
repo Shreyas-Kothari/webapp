@@ -193,7 +193,7 @@ jobs:
         run: |
           InstanceRefreshId=$(aws autoscaling start-instance-refresh \
             --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-            --strategy Rolling
+            --strategy Rolling \
             | jq -r '.InstanceRefreshId')
           echo "InstanceRefreshId=$InstanceRefreshId"
           echo "InstanceRefreshId=$InstanceRefreshId" >> $GITHUB_OUTPUT
