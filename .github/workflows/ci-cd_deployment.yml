@@ -89,23 +89,6 @@ jobs:
           echo "AMI_ID=$AMI_ID"
           echo "PACKER_BUILD_IMAGE_ID=$AMI_ID" >> $GITHUB_OUTPUT
 
-  launch_template_command:
-    name: Running the launch template command raw
-    needs: build_ami
-    environment: dev
-    runs-on: ubuntu-latest
-    steps:
-      - name: Running launch template commands
-        run: |
-          echo "Running describe-launch-templates command"
-          aws ec2 describe-launch-templates --launch-template-name ${{ vars.Launch_Template }}
-
-      - name: Running launch templates version command raw
-        run: |
-          echo "Running describe-launch-template-versions command"
-          aws ec2 describe-launch-template-versions --launch-template-id ${{ needs.build_ami.outputs.PACKER_IMAGE_ID }}
-
-
   get_launch_template_id:
     name: Get Launch Template ID
     environment: dev
@@ -139,7 +122,7 @@ jobs:
     needs: [get_launch_template_id,build_ami]
     if: ${{ needs.get_launch_template_id.outputs.Launch_Template_ID != '' }}
     outputs:
-      launch_template_version: ${{ steps.create_version.outputs.TEMPLATE_VERSION }}
+      launch_template_version: ${{ steps.create_new_version.outputs.TEMPLATE_VERSION }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -148,15 +131,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-east-1"
 
-      - name: Create a new version of the Launch Template
-        id: create_version
+      - name: Get Latest Version Number
+        id: get_latest_version
+        run: |
+          LATEST_VERSION=$(aws ec2 describe-launch-templates \
+            --launch-template-id ${{ needs.get_launch_template_id.outputs.Launch_Template_ID }} \
+            --query 'LaunchTemplates[0].LatestVersionNumber' \
+            --output text)
+          echo "Last_VERSION=$LATEST_VERSION"
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+
+      - name: Create a New Version of the Launch Template
+        id: create_new_version
         run: |
           TEMPLATE_VERSION=$(aws ec2 create-launch-template-version \
             --launch-template-id ${{ needs.get_launch_template_id.outputs.Launch_Template_ID }} \
             --version-description "New version with updated AMI" \
-            --source-version 1 \
+            --source-version $LATEST_VERSION \
             --launch-template-data "{\"ImageId\":\"${{ needs.build_ami.outputs.PACKER_IMAGE_ID }}\"}" \
             | jq -r '.LaunchTemplateVersion.VersionNumber')
+          echo "New TEMPLATE_VERSION=$TEMPLATE_VERSION"
           echo "TEMPLATE_VERSION=$TEMPLATE_VERSION" >> $GITHUB_OUTPUT
 
   update_asg_with_new_version:
