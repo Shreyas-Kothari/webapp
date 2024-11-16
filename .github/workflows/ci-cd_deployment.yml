@@ -89,14 +89,22 @@ jobs:
           echo "AMI_ID=$AMI_ID"
           echo "PACKER_BUILD_IMAGE_ID=$AMI_ID" >> $GITHUB_OUTPUT
 
-  access_ami_id:
-    name: Access the AMI ID from last job
+  launch_template_command:
+    name: Running the launch template command raw
     needs: build_ami
+    environment: dev
     runs-on: ubuntu-latest
     steps:
-      - name: Access the AMI ID from last job
+      - name: Running launch template commands
         run: |
-          echo "AMI_ID=${{ needs.build_ami.outputs.PACKER_IMAGE_ID }}"
+          echo "Running describe-launch-templates command"
+          aws ec2 describe-launch-templates --launch-template-name ${{ vars.Launch_Template }}
+
+      - name: Running launch templates version command raw
+        run: |
+          echo "Running describe-launch-template-versions command"
+          aws ec2 describe-launch-template-versions --launch-template-id ${{ needs.build_ami.outputs.PACKER_IMAGE_ID }}
+
 
   get_launch_template_id:
     name: Get Launch Template ID
