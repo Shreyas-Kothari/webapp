@@ -119,6 +119,7 @@ jobs:
   create_launch_template_version:
     name: Create New Launch Template Version
     runs-on: ubuntu-latest
+    environment: dev
     needs: [get_launch_template_id,build_ami]
     if: ${{ needs.get_launch_template_id.outputs.Launch_Template_ID != '' }}
     outputs:
@@ -213,43 +214,183 @@ jobs:
           
       - name: Wait for Instance Refresh to Complete
         run: |
-          aws autoscaling describe-instance-refreshes \
+          ASG_NAME=${{ vars.ASG_NAME }}
+          INSTANCE_REFRESH_ID=${{ needs.start_instance_refresh.outputs.InstanceRefreshId }}
+          
+          # Polling the status of the instance refresh
+          STATUS="InProgress"
+          while [ "$STATUS" == "InProgress" ]; do
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name "$ASG_NAME" \
+              --instance-refresh-ids "$INSTANCE_REFRESH_ID" \
+              --query 'InstanceRefreshes[0].Status' \
+              --output text)
+            
+            echo "Current status: $STATUS"
+            
+            if [ "$STATUS" == "InProgress" ]; then
+              sleep 30  # Wait for 30 seconds before checking again
+            fi
+          done
+          
+          # Check the final status
+          if [ "$STATUS" == "Successful" ]; then
+            echo "Instance refresh completed successfully."
+            exit 0
+          else
+            echo "Instance refresh failed with status: $STATUS"
+            exit 1
+          fi
+
+  get_launch_template_id_demo:
+    name: Get Launch Template ID Demo
+    environment: demo
+    runs-on: ubuntu-latest
+    outputs:
+      Launch_Template_ID: ${{ steps.get_lt_id.outputs.LT_ID }}
+    needs: build_ami
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Get Launch Template ID
+        id: get_lt_id
+        run: |
+          LT_ID=$(aws ec2 describe-launch-templates \
+          --launch-template-name ${{ vars.Launch_Template }} \
+          | jq '.LaunchTemplates[].LaunchTemplateId')
+          echo "Initial LT_ID=$LT_ID"
+          LT_ID="${LT_ID%\"}"
+          LT_ID="${LT_ID#\"}"
+          echo "After processing LT_ID=$LT_ID"
+          echo "LT_ID=$LT_ID" >> $GITHUB_OUTPUT
+
+  create_launch_template_version_demo:
+    name: Create New Launch Template Version Demo
+    runs-on: ubuntu-latest
+    environment: demo
+    needs: [get_launch_template_id_demo,build_ami]
+    if: ${{ needs.get_launch_template_id_demo.outputs.Launch_Template_ID != '' }}
+    outputs:
+      launch_template_version: ${{ steps.create_new_version.outputs.TEMPLATE_VERSION }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Get Latest Version Number
+        id: get_latest_version
+        run: |
+          LATEST_VERSION=$(aws ec2 describe-launch-templates \
+            --launch-template-id ${{ needs.get_launch_template_id_demo.outputs.Launch_Template_ID }} \
+            --query 'LaunchTemplates[0].LatestVersionNumber' \
+            --output text)
+          echo "Last_VERSION=$LATEST_VERSION"
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+
+      - name: Create a New Version of the Launch Template
+        id: create_new_version
+        run: |
+          TEMPLATE_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-id ${{ needs.get_launch_template_id_demo.outputs.Launch_Template_ID }} \
+            --version-description "New version with updated AMI" \
+            --source-version $LATEST_VERSION \
+            --launch-template-data "{\"ImageId\":\"${{ needs.build_ami.outputs.PACKER_IMAGE_ID }}\"}" \
+            | jq -r '.LaunchTemplateVersion.VersionNumber')
+          echo "New TEMPLATE_VERSION=$TEMPLATE_VERSION"
+          echo "TEMPLATE_VERSION=$TEMPLATE_VERSION" >> $GITHUB_OUTPUT
+
+  update_asg_with_new_version_demo:
+    name: Update ASG with New Launch Template Version Demo
+    environment: demo
+    runs-on: ubuntu-latest
+    needs: [get_launch_template_id_demo,create_launch_template_version_demo]
+    if: ${{ needs.create_launch_template_version_demo.outputs.launch_template_version != '' }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Update ASG to use the new Launch Template version
+        run: |
+          aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-            --instance-refresh-ids ${{needs.start_instance_refresh.outputs.InstanceRefreshId}} \
-            --query 'InstanceRefreshes[].Status' \
-            --output text
+            --launch-template "LaunchTemplateId=${{needs.get_launch_template_id_demo.outputs.Launch_Template_ID}},Version=${{ needs.create_launch_template_version_demo.outputs.launch_template_version }}"
 
-  # update_asg:
-  #   name: Update ASG with New AMI
-  #   runs-on: ubuntu-latest
-  #   needs: get_launch_template_id
-  #   steps:
-  #     - name: Create a new version of the Launch Template
-  #       run: |
-  #         aws ec2 create-launch-template-version \
-  #         --launch-template-id $LT_ID \
-  #         --version-description "New version with updated AMI" \
-  #         --source-version 1 \
-  #         --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
+  start_instance_refresh_demo:
+    name: Start Instance Refresh Demo
+    environment: demo
+    runs-on: ubuntu-latest
+    needs: update_asg_with_new_version_demo
+    outputs:
+      InstanceRefreshId: ${{ steps.start_refresh.outputs.InstanceRefreshId }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
 
-  #     - name: Update ASG to use the new Launch Template version
-  #       run: |
-  #         aws autoscaling update-auto-scaling-group \
-  #         --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-  #         --launch-template "LaunchTemplateId=$LT_ID,Version=\$Latest" \
-  #         --strategy Rolling
+      - name: Start an instance refresh
+        id: start_refresh
+        run: |
+          InstanceRefreshId=$(aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name ${{ vars.ASG_NAME }} \
+            --strategy Rolling \
+            | jq -r '.InstanceRefreshId')
+          echo "InstanceRefreshId=$InstanceRefreshId"
+          echo "InstanceRefreshId=$InstanceRefreshId" >> $GITHUB_OUTPUT
 
-  #     - name: Start an instance refresh
-  #       run: |
-  #         aws autoscaling start-instance-refresh \
-  #         --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-  #         --preferences "{\"MinHealthyPercentage\":75}
-
-  #     - name: Wait for Instance Refresh to Complete
-  #       run: |
-  #         aws autoscaling describe-instance-refreshes \
-  #         --auto-scaling-group-name ${{ vars.ASG_NAME }} \
-  #         --instance-refresh-ids $(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names ${{ vars.ASG_NAME }} | jq -r '.AutoScalingGroups[].LatestInstanceRefreshId') \
-  #         --query 'InstanceRefreshes[].Status' \
-  #         --output text
-      
+  wait_for_refresh_completion_demo:
+    name: Wait for Instance Refresh to Complete Demo
+    environment: demo
+    runs-on: ubuntu-latest
+    needs: start_instance_refresh_demo
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+          
+      - name: Wait for Instance Refresh to Complete
+        run: |
+          ASG_NAME=${{ vars.ASG_NAME }}
+          INSTANCE_REFRESH_ID=${{ needs.start_instance_refresh_demo.outputs.InstanceRefreshId }}
+          
+          # Polling the status of the instance refresh
+          STATUS="InProgress"
+          while [ "$STATUS" == "InProgress" ]; do
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name "$ASG_NAME" \
+              --instance-refresh-ids "$INSTANCE_REFRESH_ID" \
+              --query 'InstanceRefreshes[0].Status' \
+              --output text)
+            
+            echo "Current status: $STATUS"
+            
+            if [ "$STATUS" == "InProgress" ]; then
+              sleep 30  # Wait for 30 seconds before checking again
+            fi
+          done
+          
+          # Check the final status
+          if [ "$STATUS" == "Successful" ]; then
+            echo "Instance refresh completed successfully."
+            exit 0
+          else
+            echo "Instance refresh failed with status: $STATUS"
+            exit 1
+          fi
