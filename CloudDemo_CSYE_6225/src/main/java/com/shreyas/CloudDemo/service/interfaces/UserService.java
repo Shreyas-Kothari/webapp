@@ -2,6 +2,7 @@ package com.shreyas.CloudDemo.service.interfaces;
 
 import com.shreyas.CloudDemo.bean.UserBean;
 import com.shreyas.CloudDemo.bean.UserProfilePicBean;
+import com.shreyas.CloudDemo.bean.VerificationResponse;
 import org.apache.coyote.BadRequestException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,5 +21,5 @@ public interface UserService {
 
     boolean deleteUserProfilePicture(String emailId);
 
-    String verifyUser(String user, String token);
+    VerificationResponse verifyUser(String user, String token);
 }
