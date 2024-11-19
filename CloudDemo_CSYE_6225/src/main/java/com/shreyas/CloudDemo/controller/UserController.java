@@ -3,6 +3,7 @@ package com.shreyas.CloudDemo.controller;
 import com.shreyas.CloudDemo.annotation.Observability;
 import com.shreyas.CloudDemo.bean.UserBean;
 import com.shreyas.CloudDemo.bean.UserProfilePicBean;
+import com.shreyas.CloudDemo.bean.VerificationResponse;
 import com.shreyas.CloudDemo.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -138,7 +139,10 @@ public class UserController extends BaseController {
     @GetMapping(value= "/verify", produces = "text/html")
     public ResponseEntity<String> verifyUser(@RequestParam("user") String email,
                                            @RequestParam("token") String token) {
-        String response = userService.verifyUser(email, token);
-        return SuccessResponse(response);
+        VerificationResponse response = userService.verifyUser(email, token);
+        if (response.isSuccess())
+            return SuccessResponse(response.getMessage());
+        else
+            return ErrorResponse(HttpStatus.BAD_REQUEST, response.getMessage());
     }
 }

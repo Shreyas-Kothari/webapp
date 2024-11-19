@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shreyas.CloudDemo.bean.EmailRequest;
 import com.shreyas.CloudDemo.bean.UserBean;
 import com.shreyas.CloudDemo.bean.UserProfilePicBean;
+import com.shreyas.CloudDemo.bean.VerificationResponse;
 import com.shreyas.CloudDemo.entity.Image;
 import com.shreyas.CloudDemo.entity.User;
 import com.shreyas.CloudDemo.entity.VerificationToken;
@@ -71,8 +72,6 @@ public class UserServiceImpl implements UserService {
         log.info("User verification token created successfully");
 
         String verificationTokenLink = baseUrl + "/v1/users/verify?user=" + u.getId() + "&token=" + token.getToken();
-
-        log.info("Verification link is: {}", verificationTokenLink);
 
         String message = buildEmail(u.getFirstName(), verificationTokenLink);
 
@@ -169,7 +168,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String verifyUser(String user, String token) {
+    public VerificationResponse verifyUser(String user, String token) {
         Optional<VerificationToken> verificationToken = verificationTokenRepo.findByToken(token);
         if (verificationToken.isPresent()) {
             User userEntity = verificationToken.get().getUser();
@@ -179,10 +178,10 @@ public class UserServiceImpl implements UserService {
                 userEntity.setIsEnabled(true);
                 userRepo.save(userEntity);
 
-                return verificationSuccess(userEntity.getFirstName());
+                return new VerificationResponse(true,verificationSuccess(userEntity.getFirstName()));
             }
         }
-        return verificationFailed();
+        return new VerificationResponse(false,verificationFailed());
     }
 
     private void sendVerificationMail(String emailId, String message) {
@@ -324,7 +323,7 @@ public class UserServiceImpl implements UserService {
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
                 "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
                 "        \n" +
-                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi  User,</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> You failed to register <p>Please check the link again if its expired</p>" +
+                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi  User,</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> You failed to register <p>Please check the link again if its expired or incorrect</p>" +
                 "        \n" +
                 "      </td>\n" +
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +

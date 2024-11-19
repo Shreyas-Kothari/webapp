@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartException;
@@ -102,6 +103,15 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "Unsupported Multipart");
         errorResponse.put("message", ex.getMessage());
         log.error("MultipartException: {}", errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, String>> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex){
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Unsupported Multipart");
+        errorResponse.put("message", ex.getMessage());
+        log.error("MissingServletRequestParameterException: {}", errorResponse);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
