@@ -33,7 +33,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                         .requestMatchers("/v1/users").permitAll()
                                         .requestMatchers("/v1/users/verify").permitAll()
-                                        .requestMatchers("/healthz","/cicd").permitAll()
+                                        .requestMatchers("/healthz").permitAll()
                                         .anyRequest().authenticated()
                         ))
                 .exceptionHandling(exceptionHandling -> exceptionHandling
