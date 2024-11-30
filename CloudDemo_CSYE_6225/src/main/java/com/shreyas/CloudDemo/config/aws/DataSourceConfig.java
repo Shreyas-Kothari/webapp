@@ -8,7 +8,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
+import javax.management.ServiceNotFoundException;
 import javax.sql.DataSource;
 import java.util.Map;
 
@@ -31,7 +31,7 @@ public class DataSourceConfig {
 
     @Bean
     @Primary
-    public DataSource dataSource() {
+    public DataSource dataSource() throws ServiceNotFoundException {
         if (dbUsername != null && dbPassword != null) {
             // Use credentials from application.properties or environment variables
             log.info("Using database credentials from application properties i.e environment variables.");
