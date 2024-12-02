@@ -19,7 +19,7 @@ public class SNSClientConfig {
         return SnsClient.builder()
                 .region(Region.of(s3Region))
                 // comment below line to run in local
-                .credentialsProvider(InstanceProfileCredentialsProvider.create())
+//                .credentialsProvider(InstanceProfileCredentialsProvider.create())
                 .build();
     }
 }
