@@ -19,7 +19,7 @@ public class S3ClientConfig {
         return S3Client.builder()
                 .region(Region.of(s3Region))
                 // comment below line to run in local
-//                .credentialsProvider(InstanceProfileCredentialsProvider.create())
+                .credentialsProvider(InstanceProfileCredentialsProvider.create())
                 .build();
     }
 }
