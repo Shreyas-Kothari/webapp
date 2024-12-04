@@ -145,4 +145,10 @@ public class UserController extends BaseController {
         else
             return ErrorResponse(HttpStatus.BAD_REQUEST, response.getMessage());
     }
+
+    @Observability
+    @GetMapping(value = "/cicd")
+    public ResponseEntity<String> CICD(HttpServletRequest request, Authentication authentication) throws BadRequestException {
+        return SuccessResponse("Success Response");
+    }
 }

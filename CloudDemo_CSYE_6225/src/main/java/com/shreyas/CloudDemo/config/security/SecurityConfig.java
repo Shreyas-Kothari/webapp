@@ -34,6 +34,7 @@ public class SecurityConfig {
                                         .requestMatchers("/v1/users").permitAll()
                                         .requestMatchers("/v1/users/verify").permitAll()
                                         .requestMatchers("/healthz").permitAll()
+                                        .requestMatchers("/v1/users/cicd").permitAll()
                                         .anyRequest().authenticated()
                         ))
                 .exceptionHandling(exceptionHandling -> exceptionHandling
